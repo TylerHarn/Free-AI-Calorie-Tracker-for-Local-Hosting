@@ -12,6 +12,7 @@ from cohere_client import CohereEstimationError, estimate_calories
 load_dotenv()
 
 USER_COOKIE = "user_id"
+COOKIE_MAX_AGE = 60 * 60 * 24 * 365  # 1 year — this app has no password, so "signed in" should stick
 
 
 @asynccontextmanager
@@ -82,7 +83,7 @@ def create_user(body: CreateUserRequest, response: Response) -> dict:
     if not name:
         raise HTTPException(status_code=400, detail="Name is required.")
     row = db.create_user(name)
-    response.set_cookie(USER_COOKIE, str(row["id"]), httponly=True, samesite="lax")
+    response.set_cookie(USER_COOKIE, str(row["id"]), httponly=True, samesite="lax", max_age=COOKIE_MAX_AGE)
     return _row_to_user(row)
 
 
@@ -95,7 +96,7 @@ def select_user(body: SelectUserRequest, response: Response) -> dict:
     row = db.get_user(body.user_id)
     if row is None:
         raise HTTPException(status_code=404, detail="No such user.")
-    response.set_cookie(USER_COOKIE, str(row["id"]), httponly=True, samesite="lax")
+    response.set_cookie(USER_COOKIE, str(row["id"]), httponly=True, samesite="lax", max_age=COOKIE_MAX_AGE)
     return _row_to_user(row)
 
 

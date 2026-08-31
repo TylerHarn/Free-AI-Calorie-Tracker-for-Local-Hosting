@@ -36,9 +36,7 @@ export default function TrackerPage({ user, onSignOut }: { user: User; onSignOut
   useEffect(() => {
     getMealHistory()
       .then(setHistory)
-      .catch(() => {
-        // history is a nice-to-have; ignore load failures on first render
-      });
+      .catch((err) => setError(err instanceof Error ? err.message : "Could not load your meal history."));
   }, []);
 
   async function handleEstimate(image: Blob) {
