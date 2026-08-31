@@ -2,7 +2,21 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        ink: "#211E1A",
+        paper: "#EFE6D2",
+        "paper-raised": "#FFFDF7",
+        ember: "#E1592C",
+        sage: "#59754F",
+        rust: "#A63A2E",
+      },
+      fontFamily: {
+        display: ["Fraunces", "serif"],
+        sans: ["Work Sans", "sans-serif"],
+        mono: ["Space Mono", "monospace"],
+      },
+    },
   },
   plugins: [],
 };

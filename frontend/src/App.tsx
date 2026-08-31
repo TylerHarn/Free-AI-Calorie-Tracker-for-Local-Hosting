@@ -16,7 +16,7 @@ export default function App() {
   }, []);
 
   if (isLoading) {
-    return <div className="min-h-screen bg-slate-50" />;
+    return <div className="min-h-screen bg-paper" />;
   }
 
   if (!user) {

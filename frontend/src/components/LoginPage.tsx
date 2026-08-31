@@ -44,57 +44,46 @@ export default function LoginPage({ onSignedIn }: { onSignedIn: (user: User) => 
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 px-4 py-10">
-      <div className="mx-auto max-w-md space-y-8">
-        <header className="text-center">
-          <h1 className="text-2xl font-bold text-slate-900">Calorie Tracker</h1>
-          <p className="mt-1 text-sm text-slate-500">Who's logging a meal?</p>
-        </header>
+    <div className="flex min-h-screen flex-col px-6 pt-[max(3rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
+      <header className="mb-8">
+        <p className="font-mono text-xs uppercase tracking-widest text-ink/40">Calorie Tracker</p>
+        <h1 className="mt-2 font-display text-4xl font-medium text-ink">Who's eating?</h1>
+      </header>
 
-        <section className="rounded-2xl bg-white p-6 shadow-md">
-          {members.length > 0 && (
-            <div className="mb-6 space-y-2">
-              {members.map((member) => (
-                <button
-                  key={member.id}
-                  type="button"
-                  disabled={isBusy}
-                  onClick={() => handleSelect(member)}
-                  className="flex w-full items-center justify-between rounded-lg border border-slate-200 px-4 py-3 text-left text-sm font-medium text-slate-800 transition hover:border-emerald-400 hover:bg-emerald-50 disabled:opacity-50"
-                >
-                  {member.name}
-                  {!member.setup_complete && (
-                    <span className="text-xs font-normal text-slate-400">setup needed</span>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
+      <div className="flex-1 space-y-2">
+        {members.map((member) => (
+          <button
+            key={member.id}
+            type="button"
+            disabled={isBusy}
+            onClick={() => handleSelect(member)}
+            className="flex w-full items-center justify-between rounded-2xl border border-ink/15 bg-paper-raised px-5 py-4 text-left transition hover:border-ember disabled:opacity-50"
+          >
+            <span className="font-display text-lg text-ink">{member.name}</span>
+            {!member.setup_complete && (
+              <span className="font-mono text-[11px] uppercase tracking-wide text-ink/35">setup needed</span>
+            )}
+          </button>
+        ))}
 
-          <form onSubmit={handleCreate} className="space-y-3">
-            <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Add a household member
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder="Name"
-                className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
-              />
-              <button
-                type="submit"
-                disabled={isBusy || !newName.trim()}
-                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
-              >
-                Add
-              </button>
-            </div>
-          </form>
+        <form onSubmit={handleCreate} className="flex items-center gap-2 rounded-2xl border border-dashed border-ink/25 px-5 py-4">
+          <input
+            type="text"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            placeholder="+ New place setting"
+            className="flex-1 bg-transparent font-display text-lg text-ink placeholder:text-ink/35 focus:outline-none"
+          />
+          <button
+            type="submit"
+            disabled={isBusy || !newName.trim()}
+            className="shrink-0 rounded-full bg-ember px-4 py-2 font-sans text-sm font-semibold text-paper-raised transition hover:bg-ember/90 disabled:opacity-50"
+          >
+            Add
+          </button>
+        </form>
 
-          {error && <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-        </section>
+        {error && <p className="rounded-xl bg-rust/10 p-3 font-sans text-sm text-rust">{error}</p>}
       </div>
     </div>
   );

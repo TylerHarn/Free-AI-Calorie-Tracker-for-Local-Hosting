@@ -1,5 +1,6 @@
-# Claude Code project guidance (kept local, not pushed to GitHub)
+# Claude Code project guidance and local tooling config (kept local, not pushed to GitHub)
 CLAUDE.md
+.claude/
 
 # Environment / secrets
 .env

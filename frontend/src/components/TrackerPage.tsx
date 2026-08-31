@@ -99,49 +99,57 @@ export default function TrackerPage({ user, onSignOut }: { user: User; onSignOut
     .reduce((sum, meal) => sum + meal.estimated_calories, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 px-4 py-10">
-      <div className="mx-auto max-w-md space-y-8">
-        <header className="text-center">
-          <div className="mb-1 flex items-center justify-between">
-            <span className="text-sm font-medium text-slate-500">Hi, {user.name}</span>
-            <button
-              type="button"
-              onClick={handleSignOut}
-              className="text-sm font-medium text-slate-400 underline-offset-2 hover:text-slate-600 hover:underline"
-            >
-              Switch user
-            </button>
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900">Calorie Tracker</h1>
-          <p className="mt-1 text-sm text-slate-500">Snap a photo of your meal and get an instant calorie estimate.</p>
-        </header>
+    <div className="mx-auto min-h-screen max-w-lg px-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-16">
+      <header className="mb-6 flex items-center justify-between">
+        <div>
+          <p className="font-mono text-[11px] uppercase tracking-widest text-ink/40">Calorie Tracker</p>
+          <h1 className="font-display text-2xl font-medium text-ink">{user.name}</h1>
+        </div>
+        <button
+          type="button"
+          onClick={handleSignOut}
+          className="rounded-full border border-ink/15 px-3 py-1.5 font-sans text-xs font-medium text-ink/60 hover:border-ink/30 hover:text-ink"
+        >
+          Switch
+        </button>
+      </header>
 
-        {user.daily_calorie_goal != null && <ProgressBar consumed={consumedToday} goal={user.daily_calorie_goal} />}
+      {user.daily_calorie_goal != null && (
+        <div className="mb-8">
+          <ProgressBar consumed={consumedToday} goal={user.daily_calorie_goal} />
+        </div>
+      )}
 
-        <section className="rounded-2xl bg-white p-6 shadow-md">
-          <PhotoCapture onEstimate={handleEstimate} isEstimating={isEstimating} />
-        </section>
+      <div className="mb-6">
+        <PhotoCapture onEstimate={handleEstimate} isEstimating={isEstimating} />
+      </div>
 
-        {error && (
-          <p className="rounded-lg bg-red-50 p-3 text-center text-sm text-red-700">{error}</p>
-        )}
+      {error && <p className="mb-4 rounded-xl bg-rust/10 p-3 text-center font-sans text-sm text-rust">{error}</p>}
 
-        {pendingEstimate && (
+      {pendingEstimate && (
+        <div className="mb-6">
           <CalorieResult
             estimate={pendingEstimate}
             onAdd={(calories) => handleAddEntry({ ...pendingEstimate, estimated_calories: calories })}
             onDiscard={() => setPendingEstimate(null)}
             isSaving={isSavingEstimate}
           />
-        )}
+        </div>
+      )}
 
+      <div className="mb-8">
         <AddMealManually onAdd={handleAddEntry} />
-
-        <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">History</h2>
-          <MealHistory meals={history} onUpdateCalories={handleUpdateCalories} onDelete={handleDelete} />
-        </section>
       </div>
+
+      <section>
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="font-mono text-[11px] uppercase tracking-widest text-ink/40">Today's ticket</h2>
+          <span className="font-mono text-[11px] text-ink/40">{history.length} item{history.length === 1 ? "" : "s"}</span>
+        </div>
+        <div className="rounded-2xl border border-ink/10 bg-paper-raised px-4">
+          <MealHistory meals={history} onUpdateCalories={handleUpdateCalories} onDelete={handleDelete} />
+        </div>
+      </section>
     </div>
   );
 }

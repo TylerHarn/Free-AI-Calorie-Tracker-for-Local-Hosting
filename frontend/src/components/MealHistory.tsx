@@ -18,11 +18,11 @@ interface MealHistoryProps {
 
 export default function MealHistory({ meals, onUpdateCalories, onDelete }: MealHistoryProps) {
   if (meals.length === 0) {
-    return <p className="text-center text-sm text-slate-400">No meals logged yet.</p>;
+    return <p className="py-4 text-center font-sans text-sm text-ink/40">No meals logged yet.</p>;
   }
 
   return (
-    <ul className="max-h-80 space-y-2 overflow-y-auto">
+    <ul>
       {meals.map((meal) => (
         <MealRow key={meal.id} meal={meal} onUpdateCalories={onUpdateCalories} onDelete={onDelete} />
       ))}
@@ -51,63 +51,57 @@ function MealRow({
   }
 
   return (
-    <li className="flex items-center justify-between gap-3 rounded-lg border border-slate-100 bg-white px-4 py-3 shadow-sm">
-      <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-slate-800">{meal.food_name}</p>
-        <p className="text-xs text-slate-400">{formatDate(meal.created_at)}</p>
+    <li className="flex items-center gap-3 border-b border-dotted border-ink/20 py-3 first:pt-0 last:border-b-0">
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-sans text-sm text-ink">{meal.food_name}</p>
+        <p className="font-mono text-[11px] text-ink/40">{formatDate(meal.created_at)}</p>
       </div>
 
-      <div className="flex shrink-0 items-center gap-2">
-        {isEditing ? (
-          <>
-            <input
-              type="number"
-              min={0}
-              autoFocus
-              value={draftCalories}
-              onChange={(e) => setDraftCalories(e.target.value)}
-              className="w-20 rounded-md border border-slate-300 px-2 py-1 text-right text-sm focus:border-emerald-500 focus:outline-none"
-            />
-            <button
-              type="button"
-              onClick={handleSave}
-              className="text-xs font-semibold text-emerald-600 hover:text-emerald-700"
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setDraftCalories(String(meal.estimated_calories));
-                setIsEditing(false);
-              }}
-              className="text-xs font-medium text-slate-400 hover:text-slate-600"
-            >
-              Cancel
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              type="button"
-              onClick={() => setIsEditing(true)}
-              className="text-sm font-semibold text-slate-700 hover:text-emerald-600"
-              title="Edit calories"
-            >
-              {meal.estimated_calories} kcal
-            </button>
-            <button
-              type="button"
-              onClick={() => onDelete(meal.id)}
-              className="text-slate-300 hover:text-red-500"
-              title="Delete entry"
-              aria-label="Delete entry"
-            >
-              ✕
-            </button>
-          </>
-        )}
-      </div>
+      {isEditing ? (
+        <div className="flex shrink-0 items-center gap-2">
+          <input
+            type="number"
+            min={0}
+            autoFocus
+            value={draftCalories}
+            onChange={(e) => setDraftCalories(e.target.value)}
+            className="w-20 rounded-md border border-ink/20 bg-paper px-2 py-1 text-right font-mono text-sm focus:border-ember focus:outline-none"
+          />
+          <button type="button" onClick={handleSave} className="font-sans text-xs font-semibold text-sage">
+            Save
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setDraftCalories(String(meal.estimated_calories));
+              setIsEditing(false);
+            }}
+            className="font-sans text-xs font-medium text-ink/40"
+          >
+            Cancel
+          </button>
+        </div>
+      ) : (
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setIsEditing(true)}
+            className="min-h-11 rounded-lg px-2 font-mono text-sm font-semibold text-ink tabular-nums hover:text-ember"
+            title="Edit calories"
+          >
+            {meal.estimated_calories}
+          </button>
+          <button
+            type="button"
+            onClick={() => onDelete(meal.id)}
+            className="flex h-11 w-11 items-center justify-center rounded-full text-lg text-ink/30 hover:bg-rust/10 hover:text-rust"
+            title="Delete entry"
+            aria-label="Delete entry"
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </li>
   );
 }

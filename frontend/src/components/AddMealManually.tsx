@@ -28,22 +28,22 @@ export default function AddMealManually({ onAdd }: { onAdd: (entry: MealEstimate
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="w-full rounded-lg border border-dashed border-slate-300 py-2 text-sm font-medium text-slate-500 transition hover:border-emerald-400 hover:text-emerald-600"
+        className="w-full py-2 text-center font-sans text-sm font-medium text-ink/50 underline decoration-dotted underline-offset-4 hover:text-ember"
       >
-        + Add food manually
+        + Add a food by hand
       </button>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <form onSubmit={handleSubmit} className="space-y-2 rounded-2xl border border-ink/10 bg-paper-raised p-4">
       <input
         type="text"
         placeholder="Food name"
         value={foodName}
         onChange={(e) => setFoodName(e.target.value)}
         autoFocus
-        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+        className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 font-sans text-sm focus:border-ember focus:outline-none"
       />
       <input
         type="number"
@@ -51,20 +51,20 @@ export default function AddMealManually({ onAdd }: { onAdd: (entry: MealEstimate
         placeholder="Calories"
         value={calories}
         onChange={(e) => setCalories(e.target.value)}
-        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+        className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 font-mono text-sm focus:border-ember focus:outline-none"
       />
-      <div className="flex gap-2">
+      <div className="flex gap-2 pt-1">
         <button
           type="button"
           onClick={() => setIsOpen(false)}
-          className="flex-1 rounded-lg border border-slate-200 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+          className="flex-1 rounded-full border border-ink/15 py-2 font-sans text-sm font-medium text-ink/70 hover:bg-ink/5"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={!foodName.trim() || calories.trim() === ""}
-          className="flex-1 rounded-lg bg-emerald-600 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+          className="flex-1 rounded-full bg-ember py-2 font-sans text-sm font-semibold text-paper-raised transition hover:bg-ember/90 disabled:opacity-50"
         >
           Add
         </button>

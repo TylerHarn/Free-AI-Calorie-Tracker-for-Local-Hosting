@@ -2,14 +2,18 @@ import { useState } from "react";
 import { saveSetup, type ActivityLevel, type User } from "../api";
 
 const ACTIVITY_OPTIONS: { value: ActivityLevel; label: string }[] = [
-  { value: "sedentary", label: "Sedentary (desk job, little exercise)" },
-  { value: "light", label: "Lightly active (exercise 1–3 days/week)" },
-  { value: "moderate", label: "Moderately active (exercise 3–5 days/week)" },
-  { value: "very_active", label: "Very active (hard exercise 6–7 days/week)" },
-  { value: "extra_active", label: "Extra active (physical job or 2x/day training)" },
+  { value: "sedentary", label: "Sedentary — desk job, little exercise" },
+  { value: "light", label: "Lightly active — exercise 1–3 days/week" },
+  { value: "moderate", label: "Moderately active — exercise 3–5 days/week" },
+  { value: "very_active", label: "Very active — hard exercise 6–7 days/week" },
+  { value: "extra_active", label: "Extra active — physical job or 2x/day training" },
 ];
 
 const LOSS_RATE_OPTIONS = [0.5, 1, 1.5, 2];
+
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return <label className="mb-1.5 block font-mono text-[11px] uppercase tracking-widest text-ink/40">{children}</label>;
+}
 
 export default function SetupPage({ user, onComplete }: { user: User; onComplete: (user: User) => void }) {
   const [sex, setSex] = useState<"male" | "female">("female");
@@ -56,139 +60,127 @@ export default function SetupPage({ user, onComplete }: { user: User; onComplete
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 px-4 py-10">
-      <div className="mx-auto max-w-md space-y-6">
-        <header className="text-center">
-          <h1 className="text-2xl font-bold text-slate-900">Hi {user.name}, let's set your goal</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            We'll use this to calculate a daily calorie target for weight loss.
-          </p>
-        </header>
+    <form
+      onSubmit={handleSubmit}
+      className="flex min-h-screen flex-col px-6 pt-[max(3rem,env(safe-area-inset-top))]"
+    >
+      <header className="mb-6">
+        <p className="font-mono text-xs uppercase tracking-widest text-ink/40">Order form</p>
+        <h1 className="mt-2 font-display text-3xl font-medium text-ink">Let's set {user.name}'s goal</h1>
+        <p className="mt-1 font-sans text-sm text-ink/60">
+          We'll use this to calculate a daily calorie target for weight loss.
+        </p>
+      </header>
 
-        <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl bg-white p-6 shadow-md">
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Sex</label>
-            <div className="flex gap-2">
-              {(["female", "male"] as const).map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  onClick={() => setSex(option)}
-                  className={`flex-1 rounded-lg border py-2 text-sm font-medium capitalize transition ${
-                    sex === option
-                      ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                      : "border-slate-200 text-slate-600"
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
+      <div className="flex-1 space-y-5 pb-32">
+        <div>
+          <FieldLabel>Sex</FieldLabel>
+          <div className="flex gap-2">
+            {(["female", "male"] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => setSex(option)}
+                className={`flex-1 rounded-full border py-2.5 font-sans text-sm font-medium capitalize transition ${
+                  sex === option ? "border-ember bg-ember/10 text-ember" : "border-ink/15 text-ink/60"
+                }`}
+              >
+                {option}
+              </button>
+            ))}
           </div>
+        </div>
 
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Age (years)
-            </label>
+        <div>
+          <FieldLabel>Age (years)</FieldLabel>
+          <input
+            type="number"
+            min={1}
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 font-mono text-sm focus:border-ember focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <FieldLabel>Height</FieldLabel>
+          <div className="flex gap-2">
             <input
               type="number"
-              min={1}
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+              min={0}
+              placeholder="ft"
+              value={heightFt}
+              onChange={(e) => setHeightFt(e.target.value)}
+              className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 font-mono text-sm focus:border-ember focus:outline-none"
             />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Height</label>
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <input
-                  type="number"
-                  min={0}
-                  placeholder="ft"
-                  value={heightFt}
-                  onChange={(e) => setHeightFt(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
-                />
-              </div>
-              <div className="flex-1">
-                <input
-                  type="number"
-                  min={0}
-                  max={11}
-                  placeholder="in"
-                  value={heightIn}
-                  onChange={(e) => setHeightIn(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Weight (lb)
-            </label>
             <input
               type="number"
-              min={1}
-              value={weightLb}
-              onChange={(e) => setWeightLb(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+              min={0}
+              max={11}
+              placeholder="in"
+              value={heightIn}
+              onChange={(e) => setHeightIn(e.target.value)}
+              className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 font-mono text-sm focus:border-ember focus:outline-none"
             />
           </div>
+        </div>
 
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Activity level
-            </label>
-            <select
-              value={activityLevel}
-              onChange={(e) => setActivityLevel(e.target.value as ActivityLevel)}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
-            >
-              {ACTIVITY_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div>
+          <FieldLabel>Weight (lb)</FieldLabel>
+          <input
+            type="number"
+            min={1}
+            value={weightLb}
+            onChange={(e) => setWeightLb(e.target.value)}
+            className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 font-mono text-sm focus:border-ember focus:outline-none"
+          />
+        </div>
 
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Target weight-loss rate
-            </label>
-            <div className="grid grid-cols-4 gap-2">
-              {LOSS_RATE_OPTIONS.map((rate) => (
-                <button
-                  key={rate}
-                  type="button"
-                  onClick={() => setWeeklyLossRate(rate)}
-                  className={`rounded-lg border py-2 text-sm font-medium transition ${
-                    weeklyLossRate === rate
-                      ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                      : "border-slate-200 text-slate-600"
-                  }`}
-                >
-                  {rate} lb/wk
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="w-full rounded-lg bg-emerald-600 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+        <div>
+          <FieldLabel>Activity level</FieldLabel>
+          <select
+            value={activityLevel}
+            onChange={(e) => setActivityLevel(e.target.value as ActivityLevel)}
+            className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 font-sans text-sm focus:border-ember focus:outline-none"
           >
-            {isSaving ? "Calculating..." : "Calculate my goal"}
-          </button>
-        </form>
+            {ACTIVITY_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <FieldLabel>Target weight-loss rate</FieldLabel>
+          <div className="grid grid-cols-4 gap-2">
+            {LOSS_RATE_OPTIONS.map((rate) => (
+              <button
+                key={rate}
+                type="button"
+                onClick={() => setWeeklyLossRate(rate)}
+                className={`rounded-xl border py-2.5 font-mono text-sm font-medium transition ${
+                  weeklyLossRate === rate ? "border-ember bg-ember/10 text-ember" : "border-ink/15 text-ink/60"
+                }`}
+              >
+                {rate}/wk
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {error && <p className="rounded-xl bg-rust/10 p-3 font-sans text-sm text-rust">{error}</p>}
       </div>
-    </div>
+
+      <div className="fixed inset-x-0 bottom-0 border-t border-ink/10 bg-paper/95 px-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
+        <button
+          type="submit"
+          disabled={isSaving}
+          className="w-full rounded-full bg-ember py-3.5 font-sans text-sm font-semibold text-paper-raised transition hover:bg-ember/90 disabled:opacity-50"
+        >
+          {isSaving ? "Calculating…" : "Calculate my goal"}
+        </button>
+      </div>
+    </form>
   );
 }
