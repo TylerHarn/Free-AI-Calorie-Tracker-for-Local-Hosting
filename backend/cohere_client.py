@@ -2,8 +2,9 @@ import base64
 import json
 import os
 
-import cohere
+import requests
 
+CHAT_URL = "https://api.cohere.com/v2/chat"
 MODEL = "command-a-vision-07-2025"
 
 PROMPT = (
@@ -21,13 +22,13 @@ class CohereEstimationError(RuntimeError):
     pass
 
 
-def _client() -> cohere.ClientV2:
+def _api_key() -> str:
     api_key = os.environ.get("COHERE_API_KEY")
     if not api_key:
         raise CohereEstimationError(
             "COHERE_API_KEY is not set. Add it to backend/.env (see backend/.env.example)."
         )
-    return cohere.ClientV2(api_key=api_key)
+    return api_key
 
 
 def _strip_code_fences(text: str) -> str:
@@ -35,7 +36,7 @@ def _strip_code_fences(text: str) -> str:
     if text.startswith("```"):
         text = text.split("\n", 1)[1] if "\n" in text else text
         if text.endswith("```"):
-            text = text[: -3]
+            text = text[:-3]
         if text.startswith("json"):
             text = text[4:]
     return text.strip()
@@ -45,26 +46,38 @@ def estimate_calories(image_bytes: bytes, content_type: str) -> dict:
     encoded = base64.b64encode(image_bytes).decode("utf-8")
     data_url = f"data:{content_type};base64,{encoded}"
 
-    co = _client()
     try:
-        response = co.chat(
-            model=MODEL,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": PROMPT},
-                        {"type": "image_url", "image_url": {"url": data_url}},
-                    ],
-                }
-            ],
+        response = requests.post(
+            CHAT_URL,
+            headers={
+                "Authorization": f"Bearer {_api_key()}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": MODEL,
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": PROMPT},
+                            {"type": "image_url", "image_url": {"url": data_url}},
+                        ],
+                    }
+                ],
+            },
+            timeout=60,
         )
-    except Exception as exc:  # cohere SDK raises various API/network errors
+        response.raise_for_status()
+    except requests.RequestException as exc:
         raise CohereEstimationError(f"Cohere API request failed: {exc}") from exc
 
-    raw_text = "".join(
-        item.text for item in response.message.content if getattr(item, "type", None) == "text"
-    )
+    body = response.json()
+    try:
+        raw_text = "".join(
+            item["text"] for item in body["message"]["content"] if item.get("type") == "text"
+        )
+    except (KeyError, TypeError) as exc:
+        raise CohereEstimationError(f"Unexpected Cohere response shape: {body!r}") from exc
 
     try:
         result = json.loads(_strip_code_fences(raw_text))
