@@ -3,6 +3,11 @@ import json
 import os
 
 import requests
+import truststore
+
+# Use the OS certificate store (not just certifi's bundle) so this works behind
+# corporate TLS-inspecting proxies that install their own root CA into Windows.
+truststore.inject_into_ssl()
 
 CHAT_URL = "https://api.cohere.com/v2/chat"
 MODEL = "command-a-vision-07-2025"
