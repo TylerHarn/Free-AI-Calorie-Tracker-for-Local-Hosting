@@ -1,9 +1,14 @@
-export interface Meal {
-  id: number;
+export type Confidence = "low" | "medium" | "high" | "manual";
+
+export interface MealEstimate {
   food_name: string;
   description: string;
   estimated_calories: number;
-  confidence: "low" | "medium" | "high";
+  confidence: Confidence;
+}
+
+export interface Meal extends MealEstimate {
+  id: number;
   created_at: string;
 }
 
@@ -91,7 +96,7 @@ export function saveSetup(payload: SetupPayload): Promise<User> {
   });
 }
 
-export async function estimateMeal(image: Blob): Promise<Meal> {
+export async function estimateMeal(image: Blob): Promise<MealEstimate> {
   const formData = new FormData();
   formData.append("image", image, "meal.jpg");
 
@@ -99,6 +104,26 @@ export async function estimateMeal(image: Blob): Promise<Meal> {
     method: "POST",
     body: formData,
   });
+}
+
+export function addMeal(entry: MealEstimate): Promise<Meal> {
+  return request("/api/meals", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(entry),
+  });
+}
+
+export function updateMealCalories(id: number, estimatedCalories: number): Promise<Meal> {
+  return request(`/api/meals/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ estimated_calories: estimatedCalories }),
+  });
+}
+
+export function deleteMeal(id: number): Promise<{ ok: boolean }> {
+  return request(`/api/meals/${id}`, { method: "DELETE" });
 }
 
 export function getMealHistory(): Promise<Meal[]> {

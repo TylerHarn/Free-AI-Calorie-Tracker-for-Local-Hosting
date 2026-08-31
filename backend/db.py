@@ -113,3 +113,20 @@ def list_meals(user_id: int) -> list[sqlite3.Row]:
         return conn.execute(
             "SELECT * FROM meals WHERE user_id = ? ORDER BY created_at DESC", (user_id,)
         ).fetchall()
+
+
+def update_meal_calories(meal_id: int, user_id: int, estimated_calories: int) -> sqlite3.Row | None:
+    with get_connection() as conn:
+        cursor = conn.execute(
+            "UPDATE meals SET estimated_calories = ? WHERE id = ? AND user_id = ?",
+            (estimated_calories, meal_id, user_id),
+        )
+        if cursor.rowcount == 0:
+            return None
+        return conn.execute("SELECT * FROM meals WHERE id = ?", (meal_id,)).fetchone()
+
+
+def delete_meal(meal_id: int, user_id: int) -> bool:
+    with get_connection() as conn:
+        cursor = conn.execute("DELETE FROM meals WHERE id = ? AND user_id = ?", (meal_id, user_id))
+        return cursor.rowcount > 0

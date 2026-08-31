@@ -164,14 +164,51 @@ async def estimate_meal(image: UploadFile, current_user=Depends(get_current_user
     except CohereEstimationError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 
+    return {
+        "food_name": result["food_name"],
+        "description": result["description"],
+        "estimated_calories": int(result["estimated_calories"]),
+        "confidence": result["confidence"],
+    }
+
+
+class MealEntryRequest(BaseModel):
+    food_name: str
+    description: str
+    estimated_calories: int
+    confidence: str
+
+
+@app.post("/api/meals")
+def add_meal(body: MealEntryRequest, current_user=Depends(get_current_user)) -> dict:
     row = db.insert_meal(
         user_id=current_user["id"],
-        food_name=result["food_name"],
-        description=result["description"],
-        estimated_calories=int(result["estimated_calories"]),
-        confidence=result["confidence"],
+        food_name=body.food_name,
+        description=body.description,
+        estimated_calories=body.estimated_calories,
+        confidence=body.confidence,
     )
     return _row_to_meal(row)
+
+
+class UpdateMealRequest(BaseModel):
+    estimated_calories: int
+
+
+@app.patch("/api/meals/{meal_id}")
+def update_meal(meal_id: int, body: UpdateMealRequest, current_user=Depends(get_current_user)) -> dict:
+    row = db.update_meal_calories(meal_id, current_user["id"], body.estimated_calories)
+    if row is None:
+        raise HTTPException(status_code=404, detail="No such meal.")
+    return _row_to_meal(row)
+
+
+@app.delete("/api/meals/{meal_id}")
+def remove_meal(meal_id: int, current_user=Depends(get_current_user)) -> dict:
+    deleted = db.delete_meal(meal_id, current_user["id"])
+    if not deleted:
+        raise HTTPException(status_code=404, detail="No such meal.")
+    return {"ok": True}
 
 
 @app.get("/api/meals")

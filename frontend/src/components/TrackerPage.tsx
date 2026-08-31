@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react";
-import { estimateMeal, getMealHistory, logout, type Meal, type User } from "../api";
+import {
+  addMeal,
+  deleteMeal,
+  estimateMeal,
+  getMealHistory,
+  logout,
+  updateMealCalories,
+  type Meal,
+  type MealEstimate,
+  type User,
+} from "../api";
+import AddMealManually from "./AddMealManually";
 import CalorieResult from "./CalorieResult";
 import MealHistory from "./MealHistory";
 import PhotoCapture from "./PhotoCapture";
@@ -16,9 +27,10 @@ function isToday(isoString: string) {
 }
 
 export default function TrackerPage({ user, onSignOut }: { user: User; onSignOut: () => void }) {
-  const [result, setResult] = useState<Meal | null>(null);
+  const [pendingEstimate, setPendingEstimate] = useState<MealEstimate | null>(null);
   const [history, setHistory] = useState<Meal[]>([]);
   const [isEstimating, setIsEstimating] = useState(false);
+  const [isSavingEstimate, setIsSavingEstimate] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -32,15 +44,50 @@ export default function TrackerPage({ user, onSignOut }: { user: User; onSignOut
   async function handleEstimate(image: Blob) {
     setIsEstimating(true);
     setError(null);
-    setResult(null);
+    setPendingEstimate(null);
     try {
-      const meal = await estimateMeal(image);
-      setResult(meal);
-      setHistory((prev) => [meal, ...prev]);
+      const estimate = await estimateMeal(image);
+      setPendingEstimate(estimate);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setIsEstimating(false);
+    }
+  }
+
+  async function handleAddEntry(entry: MealEstimate) {
+    setIsSavingEstimate(true);
+    setError(null);
+    try {
+      const meal = await addMeal(entry);
+      setHistory((prev) => [meal, ...prev]);
+      setPendingEstimate(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setIsSavingEstimate(false);
+    }
+  }
+
+  async function handleUpdateCalories(id: number, calories: number) {
+    const previous = history;
+    setHistory((prev) => prev.map((meal) => (meal.id === id ? { ...meal, estimated_calories: calories } : meal)));
+    try {
+      await updateMealCalories(id, calories);
+    } catch (err) {
+      setHistory(previous);
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    }
+  }
+
+  async function handleDelete(id: number) {
+    const previous = history;
+    setHistory((prev) => prev.filter((meal) => meal.id !== id));
+    try {
+      await deleteMeal(id);
+    } catch (err) {
+      setHistory(previous);
+      setError(err instanceof Error ? err.message : "Something went wrong.");
     }
   }
 
@@ -81,11 +128,20 @@ export default function TrackerPage({ user, onSignOut }: { user: User; onSignOut
           <p className="rounded-lg bg-red-50 p-3 text-center text-sm text-red-700">{error}</p>
         )}
 
-        {result && <CalorieResult meal={result} />}
+        {pendingEstimate && (
+          <CalorieResult
+            estimate={pendingEstimate}
+            onAdd={(calories) => handleAddEntry({ ...pendingEstimate, estimated_calories: calories })}
+            onDiscard={() => setPendingEstimate(null)}
+            isSaving={isSavingEstimate}
+          />
+        )}
+
+        <AddMealManually onAdd={handleAddEntry} />
 
         <section>
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">History</h2>
-          <MealHistory meals={history} />
+          <MealHistory meals={history} onUpdateCalories={handleUpdateCalories} onDelete={handleDelete} />
         </section>
       </div>
     </div>

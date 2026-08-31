@@ -7,7 +7,8 @@ A local fullstack application for tracking calories by photo. Each household mem
 - Simple household sign-in (pick your name, no password)
 - Setup calculates a daily calorie goal from your stats (Mifflin-St Jeor BMR, activity level, and target weight-loss rate)
 - Upload/drag-and-drop a meal photo, or capture one with your webcam
-- Calorie estimate and food identification via Cohere's vision API
+- Calorie estimate and food identification via Cohere's vision API — review and adjust the estimate (or discard it) before it's added to your log
+- Edit or delete any logged entry, or add a food manually without a photo
 - Daily progress bar (calories eaten vs. goal) and local meal history, per person (stored in SQLite)
 
 ## Tech Stack
