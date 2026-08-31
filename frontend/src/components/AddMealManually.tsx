@@ -104,7 +104,7 @@ export default function AddMealManually({ onAdd }: { onAdd: (entry: MealEstimate
           disabled={isEstimating || !foodName.trim()}
           className="shrink-0 rounded-lg border border-ember/40 bg-ember/10 px-3 py-2 font-sans text-xs font-semibold text-ember transition hover:bg-ember/15 disabled:opacity-50"
         >
-          {isEstimating ? "Estimating…" : "✨ Estimate"}
+          {isEstimating ? "Estimating…" : "Estimate"}
         </button>
       </div>
 
