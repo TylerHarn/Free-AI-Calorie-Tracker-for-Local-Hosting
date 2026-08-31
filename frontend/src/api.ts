@@ -7,6 +7,36 @@ export interface Meal {
   created_at: string;
 }
 
+export interface HouseholdMember {
+  id: number;
+  name: string;
+  setup_complete: boolean;
+}
+
+export interface User {
+  id: number;
+  name: string;
+  sex: "male" | "female" | null;
+  age: number | null;
+  height_cm: number | null;
+  weight_kg: number | null;
+  activity_level: string | null;
+  weekly_loss_rate_lb: number | null;
+  daily_calorie_goal: number | null;
+}
+
+export type ActivityLevel = "sedentary" | "light" | "moderate" | "very_active" | "extra_active";
+
+export interface SetupPayload {
+  sex: "male" | "female";
+  age: number;
+  height_ft: number;
+  height_in: number;
+  weight_lb: number;
+  activity_level: ActivityLevel;
+  weekly_loss_rate_lb: number;
+}
+
 async function parseErrorMessage(response: Response): Promise<string> {
   try {
     const body = await response.json();
@@ -17,26 +47,60 @@ async function parseErrorMessage(response: Response): Promise<string> {
   return `Request failed with status ${response.status}`;
 }
 
+async function request<T>(url: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(url, init);
+  if (!response.ok) {
+    throw new Error(await parseErrorMessage(response));
+  }
+  return response.json();
+}
+
+export function getUsers(): Promise<HouseholdMember[]> {
+  return request("/api/users");
+}
+
+export function createUser(name: string): Promise<User> {
+  return request("/api/users", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+  });
+}
+
+export function selectUser(userId: number): Promise<User> {
+  return request("/api/auth/select", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user_id: userId }),
+  });
+}
+
+export function getMe(): Promise<User> {
+  return request("/api/auth/me");
+}
+
+export function logout(): Promise<{ ok: boolean }> {
+  return request("/api/auth/logout", { method: "POST" });
+}
+
+export function saveSetup(payload: SetupPayload): Promise<User> {
+  return request("/api/users/me/setup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
 export async function estimateMeal(image: Blob): Promise<Meal> {
   const formData = new FormData();
   formData.append("image", image, "meal.jpg");
 
-  const response = await fetch("/api/meals/estimate", {
+  return request("/api/meals/estimate", {
     method: "POST",
     body: formData,
   });
-
-  if (!response.ok) {
-    throw new Error(await parseErrorMessage(response));
-  }
-
-  return response.json();
 }
 
-export async function getMealHistory(): Promise<Meal[]> {
-  const response = await fetch("/api/meals");
-  if (!response.ok) {
-    throw new Error(await parseErrorMessage(response));
-  }
-  return response.json();
+export function getMealHistory(): Promise<Meal[]> {
+  return request("/api/meals");
 }

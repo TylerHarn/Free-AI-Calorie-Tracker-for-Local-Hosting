@@ -1,12 +1,14 @@
 # AI-Powered Calorie Tracker
 
-A local fullstack application that takes a photo of a meal, uses the Cohere API (vision) to identify the food, and returns an estimated calorie count. Meal history is stored locally.
+A local fullstack application for tracking calories by photo. Each household member picks their name, does a one-time setup to get a personal daily calorie target for weight loss, then logs meals by photo — the Cohere API (vision) identifies the food and estimates calories, and a progress bar shows how today stacks up against their goal.
 
 ## Features
 
+- Simple household sign-in (pick your name, no password)
+- Setup calculates a daily calorie goal from your stats (Mifflin-St Jeor BMR, activity level, and target weight-loss rate)
 - Upload/drag-and-drop a meal photo, or capture one with your webcam
 - Calorie estimate and food identification via Cohere's vision API
-- Local meal history (stored in SQLite)
+- Daily progress bar (calories eaten vs. goal) and local meal history, per person (stored in SQLite)
 
 ## Tech Stack
 
