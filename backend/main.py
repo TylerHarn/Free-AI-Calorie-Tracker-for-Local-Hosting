@@ -44,6 +44,9 @@ def _row_to_meal(row) -> dict:
         "description": row["description"],
         "estimated_calories": row["estimated_calories"],
         "confidence": row["confidence"],
+        "protein_g": row["protein_g"],
+        "carbs_g": row["carbs_g"],
+        "fat_g": row["fat_g"],
         "created_at": row["created_at"],
     }
 
@@ -185,6 +188,9 @@ async def estimate_meal(image: UploadFile, current_user=Depends(get_current_user
         "description": result["description"],
         "estimated_calories": int(result["estimated_calories"]),
         "confidence": result["confidence"],
+        "protein_g": result.get("protein_g", 0),
+        "carbs_g": result.get("carbs_g", 0),
+        "fat_g": result.get("fat_g", 0),
     }
 
 
@@ -193,6 +199,9 @@ class MealEntryRequest(BaseModel):
     description: str
     estimated_calories: int
     confidence: str
+    protein_g: float = 0
+    carbs_g: float = 0
+    fat_g: float = 0
 
 
 @app.post("/api/meals")
@@ -203,17 +212,30 @@ def add_meal(body: MealEntryRequest, current_user=Depends(get_current_user)) -> 
         description=body.description,
         estimated_calories=body.estimated_calories,
         confidence=body.confidence,
+        protein_g=body.protein_g,
+        carbs_g=body.carbs_g,
+        fat_g=body.fat_g,
     )
     return _row_to_meal(row)
 
 
 class UpdateMealRequest(BaseModel):
-    estimated_calories: int
+    estimated_calories: int | None = None
+    protein_g: float | None = None
+    carbs_g: float | None = None
+    fat_g: float | None = None
 
 
 @app.patch("/api/meals/{meal_id}")
 def update_meal(meal_id: int, body: UpdateMealRequest, current_user=Depends(get_current_user)) -> dict:
-    row = db.update_meal_calories(meal_id, current_user["id"], body.estimated_calories)
+    row = db.update_meal(
+        meal_id,
+        current_user["id"],
+        estimated_calories=body.estimated_calories,
+        protein_g=body.protein_g,
+        carbs_g=body.carbs_g,
+        fat_g=body.fat_g,
+    )
     if row is None:
         raise HTTPException(status_code=404, detail="No such meal.")
     return _row_to_meal(row)

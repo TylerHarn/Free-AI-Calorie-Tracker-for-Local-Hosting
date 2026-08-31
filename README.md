@@ -7,10 +7,10 @@ A local fullstack application for tracking calories by photo, built for use on y
 - Simple household sign-in (pick your name, no password)
 - Setup calculates a daily calorie goal from your stats (Mifflin-St Jeor BMR, activity level, and target weight-loss rate)
 - Log a meal photo with your phone's native camera/library picker
-- Calorie estimate and food identification via Cohere's vision API — review and adjust the estimate (or discard it) before it's added to your log
-- Edit or delete any logged entry, or add a food manually without a photo
+- Calorie and macro (protein/carbs/fat) estimate and food identification via Cohere's vision API — review and adjust before it's added to your log
+- Edit or delete any logged entry, or add a food manually (with optional macros) without a photo
 - Log workouts (pick an activity and duration) — calories burned are estimated from a MET-based formula and subtracted from the day's ring
-- Daily progress ring (net calories vs. goal) and a receipt-style daily log mixing meals and workouts, per person (stored in SQLite)
+- Daily progress ring (net calories vs. goal), a protein/carbs/fat summary, and a receipt-style daily log mixing meals and workouts, per person (stored in SQLite)
 
 ## Tech Stack
 

@@ -1,10 +1,28 @@
 import { useState } from "react";
 import type { MealEstimate } from "../api";
 
+function parseOptionalNumber(value: string): number {
+  if (value.trim() === "") return 0;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
+
 export default function AddMealManually({ onAdd }: { onAdd: (entry: MealEstimate) => void }) {
   const [isOpen, setIsOpen] = useState(false);
   const [foodName, setFoodName] = useState("");
   const [calories, setCalories] = useState("");
+  const [protein, setProtein] = useState("");
+  const [carbs, setCarbs] = useState("");
+  const [fat, setFat] = useState("");
+
+  function reset() {
+    setFoodName("");
+    setCalories("");
+    setProtein("");
+    setCarbs("");
+    setFat("");
+    setIsOpen(false);
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -16,11 +34,12 @@ export default function AddMealManually({ onAdd }: { onAdd: (entry: MealEstimate
       description: "Manually logged",
       estimated_calories: parsedCalories,
       confidence: "manual",
+      protein_g: parseOptionalNumber(protein),
+      carbs_g: parseOptionalNumber(carbs),
+      fat_g: parseOptionalNumber(fat),
     });
 
-    setFoodName("");
-    setCalories("");
-    setIsOpen(false);
+    reset();
   }
 
   if (!isOpen) {
@@ -53,10 +72,41 @@ export default function AddMealManually({ onAdd }: { onAdd: (entry: MealEstimate
         onChange={(e) => setCalories(e.target.value)}
         className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 font-mono text-sm focus:border-ember focus:outline-none"
       />
+
+      <div>
+        <p className="mb-1 font-mono text-[11px] uppercase tracking-widest text-ink/40">Macros (optional)</p>
+        <div className="flex gap-2">
+          <input
+            type="number"
+            min={0}
+            placeholder="Protein g"
+            value={protein}
+            onChange={(e) => setProtein(e.target.value)}
+            className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 font-mono text-sm focus:border-ember focus:outline-none"
+          />
+          <input
+            type="number"
+            min={0}
+            placeholder="Carbs g"
+            value={carbs}
+            onChange={(e) => setCarbs(e.target.value)}
+            className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 font-mono text-sm focus:border-ember focus:outline-none"
+          />
+          <input
+            type="number"
+            min={0}
+            placeholder="Fat g"
+            value={fat}
+            onChange={(e) => setFat(e.target.value)}
+            className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 font-mono text-sm focus:border-ember focus:outline-none"
+          />
+        </div>
+      </div>
+
       <div className="flex gap-2 pt-1">
         <button
           type="button"
-          onClick={() => setIsOpen(false)}
+          onClick={reset}
           className="flex-1 rounded-full border border-ink/15 py-2 font-sans text-sm font-medium text-ink/70 hover:bg-ink/5"
         >
           Cancel

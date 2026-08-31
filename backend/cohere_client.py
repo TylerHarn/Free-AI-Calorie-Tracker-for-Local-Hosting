@@ -19,6 +19,9 @@ PROMPT = (
     '{"food_name": "short name of the dish", '
     '"description": "one sentence describing what you see and the estimated portion size", '
     '"estimated_calories": <integer total calories for the whole plate/portion shown>, '
+    '"protein_g": <integer grams of protein for the whole plate/portion shown>, '
+    '"carbs_g": <integer grams of carbohydrates for the whole plate/portion shown>, '
+    '"fat_g": <integer grams of fat for the whole plate/portion shown>, '
     '"confidence": "low" | "medium" | "high"}'
 )
 

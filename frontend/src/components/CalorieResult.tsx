@@ -41,6 +41,11 @@ export default function CalorieResult({
       </div>
 
       <p className="mt-3 font-sans text-sm text-ink/60">{estimate.description}</p>
+
+      <p className="mt-2 font-mono text-xs text-ink/50">
+        P {estimate.protein_g}g · C {estimate.carbs_g}g · F {estimate.fat_g}g
+      </p>
+
       <span
         className={`mt-3 inline-block rounded-full px-3 py-1 font-sans text-xs font-semibold ${CONFIDENCE_STYLES[estimate.confidence]}`}
       >

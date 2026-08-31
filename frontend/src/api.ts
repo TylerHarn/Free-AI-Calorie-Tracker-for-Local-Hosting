@@ -5,6 +5,9 @@ export interface MealEstimate {
   description: string;
   estimated_calories: number;
   confidence: Confidence;
+  protein_g: number;
+  carbs_g: number;
+  fat_g: number;
 }
 
 export interface Meal extends MealEstimate {
@@ -135,6 +138,17 @@ export function updateMealCalories(id: number, estimatedCalories: number): Promi
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ estimated_calories: estimatedCalories }),
+  });
+}
+
+export function updateMealMacros(
+  id: number,
+  macros: { protein_g: number; carbs_g: number; fat_g: number }
+): Promise<Meal> {
+  return request(`/api/meals/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(macros),
   });
 }
 

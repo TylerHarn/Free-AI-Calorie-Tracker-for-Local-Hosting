@@ -54,10 +54,13 @@ def init_db() -> None:
             """
         )
 
-        # meals predates the users table; add the column if it's not there yet.
+        # meals predates the users table and the macro columns; add whichever are missing.
         existing_columns = {row["name"] for row in conn.execute("PRAGMA table_info(meals)")}
         if "user_id" not in existing_columns:
             conn.execute("ALTER TABLE meals ADD COLUMN user_id INTEGER")
+        for macro_column in ("protein_g", "carbs_g", "fat_g"):
+            if macro_column not in existing_columns:
+                conn.execute(f"ALTER TABLE meals ADD COLUMN {macro_column} REAL NOT NULL DEFAULT 0")
 
 
 def create_user(name: str) -> sqlite3.Row:
@@ -104,16 +107,24 @@ def save_setup(
 
 
 def insert_meal(
-    user_id: int, food_name: str, description: str, estimated_calories: int, confidence: str
+    user_id: int,
+    food_name: str,
+    description: str,
+    estimated_calories: int,
+    confidence: str,
+    protein_g: float = 0,
+    carbs_g: float = 0,
+    fat_g: float = 0,
 ) -> sqlite3.Row:
     created_at = datetime.now(timezone.utc).isoformat()
     with get_connection() as conn:
         cursor = conn.execute(
             """
-            INSERT INTO meals (user_id, food_name, description, estimated_calories, confidence, created_at)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO meals
+                (user_id, food_name, description, estimated_calories, confidence, protein_g, carbs_g, fat_g, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (user_id, food_name, description, estimated_calories, confidence, created_at),
+            (user_id, food_name, description, estimated_calories, confidence, protein_g, carbs_g, fat_g, created_at),
         )
         meal_id = cursor.lastrowid
         row = conn.execute("SELECT * FROM meals WHERE id = ?", (meal_id,)).fetchone()
@@ -127,15 +138,33 @@ def list_meals(user_id: int) -> list[sqlite3.Row]:
         ).fetchall()
 
 
-def update_meal_calories(meal_id: int, user_id: int, estimated_calories: int) -> sqlite3.Row | None:
+UPDATABLE_MEAL_FIELDS = {"estimated_calories", "protein_g", "carbs_g", "fat_g"}
+
+
+def update_meal(meal_id: int, user_id: int, **fields) -> sqlite3.Row | None:
+    fields = {key: value for key, value in fields.items() if value is not None}
+    unknown = set(fields) - UPDATABLE_MEAL_FIELDS
+    if unknown:
+        raise ValueError(f"Cannot update fields: {unknown}")
+    if not fields:
+        return get_meal(meal_id, user_id)
+
+    set_clause = ", ".join(f"{key} = ?" for key in fields)
     with get_connection() as conn:
         cursor = conn.execute(
-            "UPDATE meals SET estimated_calories = ? WHERE id = ? AND user_id = ?",
-            (estimated_calories, meal_id, user_id),
+            f"UPDATE meals SET {set_clause} WHERE id = ? AND user_id = ?",
+            (*fields.values(), meal_id, user_id),
         )
         if cursor.rowcount == 0:
             return None
         return conn.execute("SELECT * FROM meals WHERE id = ?", (meal_id,)).fetchone()
+
+
+def get_meal(meal_id: int, user_id: int) -> sqlite3.Row | None:
+    with get_connection() as conn:
+        return conn.execute(
+            "SELECT * FROM meals WHERE id = ? AND user_id = ?", (meal_id, user_id)
+        ).fetchone()
 
 
 def delete_meal(meal_id: int, user_id: int) -> bool:

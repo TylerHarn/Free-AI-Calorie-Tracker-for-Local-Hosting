@@ -10,6 +10,7 @@ import {
   getWorkoutHistory,
   logout,
   updateMealCalories,
+  updateMealMacros,
   updateWorkoutCalories,
   type Meal,
   type MealEstimate,
@@ -21,6 +22,7 @@ import AddMealManually from "./AddMealManually";
 import CalorieResult from "./CalorieResult";
 import DailyLog from "./DailyLog";
 import LogWorkoutForm from "./LogWorkoutForm";
+import MacroSummary from "./MacroSummary";
 import PhotoCapture from "./PhotoCapture";
 import ProgressBar from "./ProgressBar";
 import WorkoutResult from "./WorkoutResult";
@@ -90,6 +92,17 @@ export default function TrackerPage({ user, onSignOut }: { user: User; onSignOut
     setHistory((prev) => prev.map((meal) => (meal.id === id ? { ...meal, estimated_calories: calories } : meal)));
     try {
       await updateMealCalories(id, calories);
+    } catch (err) {
+      setHistory(previous);
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    }
+  }
+
+  async function handleUpdateMacros(id: number, macros: { protein_g: number; carbs_g: number; fat_g: number }) {
+    const previous = history;
+    setHistory((prev) => prev.map((meal) => (meal.id === id ? { ...meal, ...macros } : meal)));
+    try {
+      await updateMealMacros(id, macros);
     } catch (err) {
       setHistory(previous);
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -170,6 +183,11 @@ export default function TrackerPage({ user, onSignOut }: { user: User; onSignOut
     .filter((workout) => isToday(workout.created_at))
     .reduce((sum, workout) => sum + workout.calories_burned, 0);
 
+  const mealsToday = history.filter((meal) => isToday(meal.created_at));
+  const proteinToday = mealsToday.reduce((sum, meal) => sum + meal.protein_g, 0);
+  const carbsToday = mealsToday.reduce((sum, meal) => sum + meal.carbs_g, 0);
+  const fatToday = mealsToday.reduce((sum, meal) => sum + meal.fat_g, 0);
+
   const totalItems = history.length + workouts.length;
 
   return (
@@ -189,10 +207,14 @@ export default function TrackerPage({ user, onSignOut }: { user: User; onSignOut
       </header>
 
       {user.daily_calorie_goal != null && (
-        <div className="mb-8">
+        <div className="mb-6">
           <ProgressBar consumed={consumedToday} burned={burnedToday} goal={user.daily_calorie_goal} />
         </div>
       )}
+
+      <div className="mb-8">
+        <MacroSummary protein={proteinToday} carbs={carbsToday} fat={fatToday} />
+      </div>
 
       <div className="mb-6">
         <PhotoCapture onEstimate={handleEstimate} isEstimating={isEstimating} />
@@ -242,6 +264,7 @@ export default function TrackerPage({ user, onSignOut }: { user: User; onSignOut
             meals={history}
             workouts={workouts}
             onUpdateMealCalories={handleUpdateCalories}
+            onUpdateMealMacros={handleUpdateMacros}
             onDeleteMeal={handleDelete}
             onUpdateWorkoutCalories={handleUpdateWorkoutCalories}
             onDeleteWorkout={handleDeleteWorkout}
