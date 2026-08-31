@@ -2,14 +2,10 @@
 
 A local fullstack application that takes a photo of a meal, uses the Cohere API (vision) to identify the food, and returns an estimated calorie count. Meal history is stored locally.
 
-## Status
+## Features
 
-Early stage — project scaffolding in progress.
-
-## Planned Features
-
-- Upload/select a meal photo and get an estimated calorie count
-- Food identification via Cohere's vision API
+- Upload/drag-and-drop a meal photo, or capture one with your webcam
+- Calorie estimate and food identification via Cohere's vision API
 - Local meal history (stored in SQLite)
 
 ## Tech Stack
@@ -21,4 +17,21 @@ Early stage — project scaffolding in progress.
 
 ## Getting Started
 
-_TBD — setup instructions will be added once the project scaffolding is in place._
+Requires Node.js and Python 3.11+ installed locally, and a [Cohere API key](https://dashboard.cohere.com/api-keys).
+
+**Backend:**
+```
+cd backend
+pip install -r requirements.txt
+cp .env.example .env   # then fill in COHERE_API_KEY
+uvicorn main:app --reload
+```
+
+**Frontend** (in a separate terminal):
+```
+cd frontend
+npm install
+npm run dev
+```
+
+Then open the URL Vite prints (defaults to http://localhost:5173). Both servers need to be running.
