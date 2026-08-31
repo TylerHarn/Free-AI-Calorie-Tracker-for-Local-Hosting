@@ -10,6 +10,7 @@ export default {
         ember: "#E1592C",
         sage: "#59754F",
         rust: "#A63A2E",
+        steel: "#3F6C74",
       },
       fontFamily: {
         display: ["Fraunces", "serif"],

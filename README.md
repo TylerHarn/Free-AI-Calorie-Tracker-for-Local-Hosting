@@ -9,7 +9,8 @@ A local fullstack application for tracking calories by photo, built for use on y
 - Log a meal photo with your phone's native camera/library picker
 - Calorie estimate and food identification via Cohere's vision API — review and adjust the estimate (or discard it) before it's added to your log
 - Edit or delete any logged entry, or add a food manually without a photo
-- Daily progress ring (calories eaten vs. goal) and a receipt-style meal history, per person (stored in SQLite)
+- Log workouts (pick an activity and duration) — calories burned are estimated from a MET-based formula and subtracted from the day's ring
+- Daily progress ring (net calories vs. goal) and a receipt-style daily log mixing meals and workouts, per person (stored in SQLite)
 
 ## Tech Stack
 

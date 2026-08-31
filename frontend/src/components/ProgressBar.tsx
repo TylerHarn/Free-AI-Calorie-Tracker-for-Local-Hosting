@@ -3,9 +3,18 @@ const STROKE = 16;
 const RADIUS = (SIZE - STROKE) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-export default function ProgressBar({ consumed, goal }: { consumed: number; goal: number }) {
-  const fraction = goal > 0 ? Math.min(1, consumed / goal) : 0;
-  const isOver = consumed > goal;
+export default function ProgressBar({
+  consumed,
+  burned,
+  goal,
+}: {
+  consumed: number;
+  burned: number;
+  goal: number;
+}) {
+  const net = consumed - burned;
+  const fraction = goal > 0 ? Math.min(1, Math.max(0, net) / goal) : 0;
+  const isOver = net > goal;
   const isNearLimit = !isOver && fraction >= 0.9;
 
   const ringColor = isOver ? "stroke-rust" : isNearLimit ? "stroke-ember" : "stroke-sage";
@@ -36,12 +45,19 @@ export default function ProgressBar({ consumed, goal }: { consumed: number; goal
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className={`font-mono text-4xl font-bold tabular-nums ${labelColor}`}>{consumed}</span>
+          <span className={`font-mono text-4xl font-bold tabular-nums ${labelColor}`}>{net}</span>
           <span className="font-mono text-sm text-ink/50">/ {goal} kcal</span>
         </div>
       </div>
+
+      {burned > 0 && (
+        <span className="mt-3 inline-block rounded-full bg-steel/15 px-3 py-1 font-mono text-xs font-semibold text-steel">
+          −{burned} kcal from workouts
+        </span>
+      )}
+
       {isOver && (
-        <p className="mt-2 font-mono text-xs text-rust">{consumed - goal} kcal over today's goal</p>
+        <p className="mt-2 font-mono text-xs text-rust">{net - goal} kcal over today's goal</p>
       )}
     </div>
   );

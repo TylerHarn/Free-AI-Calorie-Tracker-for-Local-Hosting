@@ -12,6 +12,22 @@ export interface Meal extends MealEstimate {
   created_at: string;
 }
 
+export interface WorkoutEstimate {
+  activity_name: string;
+  calories_burned: number;
+}
+
+export interface Workout extends WorkoutEstimate {
+  id: number;
+  created_at: string;
+}
+
+export interface Activity {
+  value: string;
+  label: string;
+  met: number;
+}
+
 export interface HouseholdMember {
   id: number;
   name: string;
@@ -128,4 +144,40 @@ export function deleteMeal(id: number): Promise<{ ok: boolean }> {
 
 export function getMealHistory(): Promise<Meal[]> {
   return request("/api/meals");
+}
+
+export function getActivities(): Promise<Activity[]> {
+  return request("/api/workouts/activities");
+}
+
+export function estimateWorkout(activity: string, durationMinutes: number): Promise<WorkoutEstimate> {
+  return request("/api/workouts/estimate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ activity, duration_minutes: durationMinutes }),
+  });
+}
+
+export function addWorkout(entry: WorkoutEstimate): Promise<Workout> {
+  return request("/api/workouts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(entry),
+  });
+}
+
+export function updateWorkoutCalories(id: number, caloriesBurned: number): Promise<Workout> {
+  return request(`/api/workouts/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ calories_burned: caloriesBurned }),
+  });
+}
+
+export function deleteWorkout(id: number): Promise<{ ok: boolean }> {
+  return request(`/api/workouts/${id}`, { method: "DELETE" });
+}
+
+export function getWorkoutHistory(): Promise<Workout[]> {
+  return request("/api/workouts");
 }

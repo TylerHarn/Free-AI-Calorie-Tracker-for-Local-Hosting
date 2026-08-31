@@ -1,20 +1,29 @@
 import { useEffect, useState } from "react";
 import {
   addMeal,
+  addWorkout,
   deleteMeal,
+  deleteWorkout,
   estimateMeal,
+  estimateWorkout,
   getMealHistory,
+  getWorkoutHistory,
   logout,
   updateMealCalories,
+  updateWorkoutCalories,
   type Meal,
   type MealEstimate,
   type User,
+  type Workout,
+  type WorkoutEstimate,
 } from "../api";
 import AddMealManually from "./AddMealManually";
 import CalorieResult from "./CalorieResult";
-import MealHistory from "./MealHistory";
+import DailyLog from "./DailyLog";
+import LogWorkoutForm from "./LogWorkoutForm";
 import PhotoCapture from "./PhotoCapture";
 import ProgressBar from "./ProgressBar";
+import WorkoutResult from "./WorkoutResult";
 
 function isToday(isoString: string) {
   const date = new Date(isoString);
@@ -31,12 +40,21 @@ export default function TrackerPage({ user, onSignOut }: { user: User; onSignOut
   const [history, setHistory] = useState<Meal[]>([]);
   const [isEstimating, setIsEstimating] = useState(false);
   const [isSavingEstimate, setIsSavingEstimate] = useState(false);
+
+  const [pendingWorkout, setPendingWorkout] = useState<WorkoutEstimate | null>(null);
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [isEstimatingWorkout, setIsEstimatingWorkout] = useState(false);
+  const [isSavingWorkout, setIsSavingWorkout] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     getMealHistory()
       .then(setHistory)
       .catch((err) => setError(err instanceof Error ? err.message : "Could not load your meal history."));
+    getWorkoutHistory()
+      .then(setWorkouts)
+      .catch((err) => setError(err instanceof Error ? err.message : "Could not load your workout history."));
   }, []);
 
   async function handleEstimate(image: Blob) {
@@ -89,6 +107,56 @@ export default function TrackerPage({ user, onSignOut }: { user: User; onSignOut
     }
   }
 
+  async function handleEstimateWorkout(activity: string, durationMinutes: number) {
+    setIsEstimatingWorkout(true);
+    setError(null);
+    setPendingWorkout(null);
+    try {
+      const estimate = await estimateWorkout(activity, durationMinutes);
+      setPendingWorkout(estimate);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setIsEstimatingWorkout(false);
+    }
+  }
+
+  async function handleAddWorkoutEntry(entry: WorkoutEstimate) {
+    setIsSavingWorkout(true);
+    setError(null);
+    try {
+      const workout = await addWorkout(entry);
+      setWorkouts((prev) => [workout, ...prev]);
+      setPendingWorkout(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setIsSavingWorkout(false);
+    }
+  }
+
+  async function handleUpdateWorkoutCalories(id: number, calories: number) {
+    const previous = workouts;
+    setWorkouts((prev) => prev.map((w) => (w.id === id ? { ...w, calories_burned: calories } : w)));
+    try {
+      await updateWorkoutCalories(id, calories);
+    } catch (err) {
+      setWorkouts(previous);
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    }
+  }
+
+  async function handleDeleteWorkout(id: number) {
+    const previous = workouts;
+    setWorkouts((prev) => prev.filter((w) => w.id !== id));
+    try {
+      await deleteWorkout(id);
+    } catch (err) {
+      setWorkouts(previous);
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    }
+  }
+
   async function handleSignOut() {
     await logout().catch(() => {});
     onSignOut();
@@ -97,6 +165,12 @@ export default function TrackerPage({ user, onSignOut }: { user: User; onSignOut
   const consumedToday = history
     .filter((meal) => isToday(meal.created_at))
     .reduce((sum, meal) => sum + meal.estimated_calories, 0);
+
+  const burnedToday = workouts
+    .filter((workout) => isToday(workout.created_at))
+    .reduce((sum, workout) => sum + workout.calories_burned, 0);
+
+  const totalItems = history.length + workouts.length;
 
   return (
     <div className="mx-auto min-h-screen max-w-lg px-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-16">
@@ -116,7 +190,7 @@ export default function TrackerPage({ user, onSignOut }: { user: User; onSignOut
 
       {user.daily_calorie_goal != null && (
         <div className="mb-8">
-          <ProgressBar consumed={consumedToday} goal={user.daily_calorie_goal} />
+          <ProgressBar consumed={consumedToday} burned={burnedToday} goal={user.daily_calorie_goal} />
         </div>
       )}
 
@@ -137,17 +211,41 @@ export default function TrackerPage({ user, onSignOut }: { user: User; onSignOut
         </div>
       )}
 
-      <div className="mb-8">
+      <div className="mb-3">
         <AddMealManually onAdd={handleAddEntry} />
       </div>
+
+      <div className="mb-6">
+        <LogWorkoutForm onEstimate={handleEstimateWorkout} isEstimating={isEstimatingWorkout} />
+      </div>
+
+      {pendingWorkout && (
+        <div className="mb-6">
+          <WorkoutResult
+            estimate={pendingWorkout}
+            onAdd={(caloriesBurned) => handleAddWorkoutEntry({ ...pendingWorkout, calories_burned: caloriesBurned })}
+            onDiscard={() => setPendingWorkout(null)}
+            isSaving={isSavingWorkout}
+          />
+        </div>
+      )}
 
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h2 className="font-mono text-[11px] uppercase tracking-widest text-ink/40">Today's ticket</h2>
-          <span className="font-mono text-[11px] text-ink/40">{history.length} item{history.length === 1 ? "" : "s"}</span>
+          <span className="font-mono text-[11px] text-ink/40">
+            {totalItems} item{totalItems === 1 ? "" : "s"}
+          </span>
         </div>
         <div className="rounded-2xl border border-ink/10 bg-paper-raised px-4">
-          <MealHistory meals={history} onUpdateCalories={handleUpdateCalories} onDelete={handleDelete} />
+          <DailyLog
+            meals={history}
+            workouts={workouts}
+            onUpdateMealCalories={handleUpdateCalories}
+            onDeleteMeal={handleDelete}
+            onUpdateWorkoutCalories={handleUpdateWorkoutCalories}
+            onDeleteWorkout={handleDeleteWorkout}
+          />
         </div>
       </section>
     </div>

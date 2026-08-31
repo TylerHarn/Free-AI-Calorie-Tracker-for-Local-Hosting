@@ -6,7 +6,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 import db
-from calorie_calc import compute_daily_calorie_goal, ft_in_to_cm, lb_to_kg
+from calorie_calc import (
+    compute_daily_calorie_goal,
+    estimate_workout_calories,
+    ft_in_to_cm,
+    lb_to_kg,
+    list_activities,
+)
 from cohere_client import CohereEstimationError, estimate_calories
 
 load_dotenv()
@@ -38,6 +44,15 @@ def _row_to_meal(row) -> dict:
         "description": row["description"],
         "estimated_calories": row["estimated_calories"],
         "confidence": row["confidence"],
+        "created_at": row["created_at"],
+    }
+
+
+def _row_to_workout(row) -> dict:
+    return {
+        "id": row["id"],
+        "activity_name": row["activity_name"],
+        "calories_burned": row["calories_burned"],
         "created_at": row["created_at"],
     }
 
@@ -215,3 +230,64 @@ def remove_meal(meal_id: int, current_user=Depends(get_current_user)) -> dict:
 @app.get("/api/meals")
 def get_meals(current_user=Depends(get_current_user)) -> list[dict]:
     return [_row_to_meal(row) for row in db.list_meals(current_user["id"])]
+
+
+@app.get("/api/workouts/activities")
+def get_activities() -> list[dict]:
+    return list_activities()
+
+
+class WorkoutEstimateRequest(BaseModel):
+    activity: str
+    duration_minutes: float
+
+
+@app.post("/api/workouts/estimate")
+def estimate_workout(body: WorkoutEstimateRequest, current_user=Depends(get_current_user)) -> dict:
+    if current_user["weight_kg"] is None:
+        raise HTTPException(status_code=400, detail="Complete setup first so we know your weight.")
+
+    try:
+        return estimate_workout_calories(body.activity, body.duration_minutes, current_user["weight_kg"])
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+class WorkoutEntryRequest(BaseModel):
+    activity_name: str
+    calories_burned: int
+
+
+@app.post("/api/workouts")
+def add_workout(body: WorkoutEntryRequest, current_user=Depends(get_current_user)) -> dict:
+    row = db.insert_workout(
+        user_id=current_user["id"],
+        activity_name=body.activity_name,
+        calories_burned=body.calories_burned,
+    )
+    return _row_to_workout(row)
+
+
+class UpdateWorkoutRequest(BaseModel):
+    calories_burned: int
+
+
+@app.patch("/api/workouts/{workout_id}")
+def update_workout(workout_id: int, body: UpdateWorkoutRequest, current_user=Depends(get_current_user)) -> dict:
+    row = db.update_workout_calories(workout_id, current_user["id"], body.calories_burned)
+    if row is None:
+        raise HTTPException(status_code=404, detail="No such workout.")
+    return _row_to_workout(row)
+
+
+@app.delete("/api/workouts/{workout_id}")
+def remove_workout(workout_id: int, current_user=Depends(get_current_user)) -> dict:
+    deleted = db.delete_workout(workout_id, current_user["id"])
+    if not deleted:
+        raise HTTPException(status_code=404, detail="No such workout.")
+    return {"ok": True}
+
+
+@app.get("/api/workouts")
+def get_workouts(current_user=Depends(get_current_user)) -> list[dict]:
+    return [_row_to_workout(row) for row in db.list_workouts(current_user["id"])]

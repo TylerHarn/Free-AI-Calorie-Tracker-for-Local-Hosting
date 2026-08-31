@@ -42,6 +42,18 @@ def init_db() -> None:
             """
         )
 
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS workouts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                activity_name TEXT NOT NULL,
+                calories_burned INTEGER NOT NULL,
+                created_at TEXT NOT NULL
+            )
+            """
+        )
+
         # meals predates the users table; add the column if it's not there yet.
         existing_columns = {row["name"] for row in conn.execute("PRAGMA table_info(meals)")}
         if "user_id" not in existing_columns:
@@ -129,4 +141,41 @@ def update_meal_calories(meal_id: int, user_id: int, estimated_calories: int) ->
 def delete_meal(meal_id: int, user_id: int) -> bool:
     with get_connection() as conn:
         cursor = conn.execute("DELETE FROM meals WHERE id = ? AND user_id = ?", (meal_id, user_id))
+        return cursor.rowcount > 0
+
+
+def insert_workout(user_id: int, activity_name: str, calories_burned: int) -> sqlite3.Row:
+    created_at = datetime.now(timezone.utc).isoformat()
+    with get_connection() as conn:
+        cursor = conn.execute(
+            """
+            INSERT INTO workouts (user_id, activity_name, calories_burned, created_at)
+            VALUES (?, ?, ?, ?)
+            """,
+            (user_id, activity_name, calories_burned, created_at),
+        )
+        return conn.execute("SELECT * FROM workouts WHERE id = ?", (cursor.lastrowid,)).fetchone()
+
+
+def list_workouts(user_id: int) -> list[sqlite3.Row]:
+    with get_connection() as conn:
+        return conn.execute(
+            "SELECT * FROM workouts WHERE user_id = ? ORDER BY created_at DESC", (user_id,)
+        ).fetchall()
+
+
+def update_workout_calories(workout_id: int, user_id: int, calories_burned: int) -> sqlite3.Row | None:
+    with get_connection() as conn:
+        cursor = conn.execute(
+            "UPDATE workouts SET calories_burned = ? WHERE id = ? AND user_id = ?",
+            (calories_burned, workout_id, user_id),
+        )
+        if cursor.rowcount == 0:
+            return None
+        return conn.execute("SELECT * FROM workouts WHERE id = ?", (workout_id,)).fetchone()
+
+
+def delete_workout(workout_id: int, user_id: int) -> bool:
+    with get_connection() as conn:
+        cursor = conn.execute("DELETE FROM workouts WHERE id = ? AND user_id = ?", (workout_id, user_id))
         return cursor.rowcount > 0
