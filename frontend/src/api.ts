@@ -125,6 +125,14 @@ export async function estimateMeal(image: Blob): Promise<MealEstimate> {
   });
 }
 
+export function estimateMealFromName(foodName: string): Promise<MealEstimate> {
+  return request("/api/meals/estimate-from-name", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ food_name: foodName }),
+  });
+}
+
 export function addMeal(entry: MealEstimate): Promise<Meal> {
   return request("/api/meals", {
     method: "POST",

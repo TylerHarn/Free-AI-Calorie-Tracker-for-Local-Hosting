@@ -12,17 +12,26 @@ truststore.inject_into_ssl()
 CHAT_URL = "https://api.cohere.com/v2/chat"
 MODEL = "command-a-vision-07-2025"
 
-PROMPT = (
+RESPONSE_SHAPE = (
+    '{"food_name": "short name of the dish", '
+    '"description": "one sentence describing the food and the estimated portion size", '
+    '"estimated_calories": <integer total calories for the whole plate/portion>, '
+    '"protein_g": <integer grams of protein for the whole plate/portion>, '
+    '"carbs_g": <integer grams of carbohydrates for the whole plate/portion>, '
+    '"fat_g": <integer grams of fat for the whole plate/portion>, '
+    '"confidence": "low" | "medium" | "high"}'
+)
+
+VISION_PROMPT = (
     "You are a nutrition estimation assistant. Look at the photo of a meal and identify "
     "the food. Respond with ONLY a single JSON object (no markdown fences, no commentary) "
-    "in exactly this shape:\n"
-    '{"food_name": "short name of the dish", '
-    '"description": "one sentence describing what you see and the estimated portion size", '
-    '"estimated_calories": <integer total calories for the whole plate/portion shown>, '
-    '"protein_g": <integer grams of protein for the whole plate/portion shown>, '
-    '"carbs_g": <integer grams of carbohydrates for the whole plate/portion shown>, '
-    '"fat_g": <integer grams of fat for the whole plate/portion shown>, '
-    '"confidence": "low" | "medium" | "high"}'
+    "in exactly this shape:\n" + RESPONSE_SHAPE
+)
+
+NAME_LOOKUP_PROMPT_PREFIX = "You are a nutrition estimation assistant. Estimate the typical nutrition for a standard single serving of the following food: "
+NAME_LOOKUP_PROMPT_SUFFIX = (
+    ". Respond with ONLY a single JSON object (no markdown fences, no commentary) in "
+    "exactly this shape:\n" + RESPONSE_SHAPE
 )
 
 
@@ -50,10 +59,7 @@ def _strip_code_fences(text: str) -> str:
     return text.strip()
 
 
-def estimate_calories(image_bytes: bytes, content_type: str) -> dict:
-    encoded = base64.b64encode(image_bytes).decode("utf-8")
-    data_url = f"data:{content_type};base64,{encoded}"
-
+def _chat_and_parse(content: list) -> dict:
     try:
         response = requests.post(
             CHAT_URL,
@@ -61,18 +67,7 @@ def estimate_calories(image_bytes: bytes, content_type: str) -> dict:
                 "Authorization": f"Bearer {_api_key()}",
                 "Content-Type": "application/json",
             },
-            json={
-                "model": MODEL,
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": PROMPT},
-                            {"type": "image_url", "image_url": {"url": data_url}},
-                        ],
-                    }
-                ],
-            },
+            json={"model": MODEL, "messages": [{"role": "user", "content": content}]},
             timeout=60,
         )
         response.raise_for_status()
@@ -99,3 +94,20 @@ def estimate_calories(image_bytes: bytes, content_type: str) -> dict:
         raise CohereEstimationError(f"Cohere response missing expected fields: {result!r}")
 
     return result
+
+
+def estimate_calories(image_bytes: bytes, content_type: str) -> dict:
+    encoded = base64.b64encode(image_bytes).decode("utf-8")
+    data_url = f"data:{content_type};base64,{encoded}"
+
+    return _chat_and_parse(
+        [
+            {"type": "text", "text": VISION_PROMPT},
+            {"type": "image_url", "image_url": {"url": data_url}},
+        ]
+    )
+
+
+def estimate_from_name(food_name: str) -> dict:
+    prompt = NAME_LOOKUP_PROMPT_PREFIX + repr(food_name) + NAME_LOOKUP_PROMPT_SUFFIX
+    return _chat_and_parse([{"type": "text", "text": prompt}])

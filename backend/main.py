@@ -13,7 +13,7 @@ from calorie_calc import (
     lb_to_kg,
     list_activities,
 )
-from cohere_client import CohereEstimationError, estimate_calories
+from cohere_client import CohereEstimationError, estimate_calories, estimate_from_name
 
 load_dotenv()
 
@@ -169,6 +169,18 @@ def setup_user(body: SetupRequest, current_user=Depends(get_current_user)) -> di
     return _row_to_user(row)
 
 
+def _meal_estimate_response(result: dict) -> dict:
+    return {
+        "food_name": result["food_name"],
+        "description": result["description"],
+        "estimated_calories": int(result["estimated_calories"]),
+        "confidence": result["confidence"],
+        "protein_g": result.get("protein_g", 0),
+        "carbs_g": result.get("carbs_g", 0),
+        "fat_g": result.get("fat_g", 0),
+    }
+
+
 @app.post("/api/meals/estimate")
 async def estimate_meal(image: UploadFile, current_user=Depends(get_current_user)) -> dict:
     if not image.content_type or not image.content_type.startswith("image/"):
@@ -183,15 +195,25 @@ async def estimate_meal(image: UploadFile, current_user=Depends(get_current_user
     except CohereEstimationError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 
-    return {
-        "food_name": result["food_name"],
-        "description": result["description"],
-        "estimated_calories": int(result["estimated_calories"]),
-        "confidence": result["confidence"],
-        "protein_g": result.get("protein_g", 0),
-        "carbs_g": result.get("carbs_g", 0),
-        "fat_g": result.get("fat_g", 0),
-    }
+    return _meal_estimate_response(result)
+
+
+class MealNameEstimateRequest(BaseModel):
+    food_name: str
+
+
+@app.post("/api/meals/estimate-from-name")
+def estimate_meal_from_name(body: MealNameEstimateRequest, current_user=Depends(get_current_user)) -> dict:
+    food_name = body.food_name.strip()
+    if not food_name:
+        raise HTTPException(status_code=400, detail="Food name is required.")
+
+    try:
+        result = estimate_from_name(food_name)
+    except CohereEstimationError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    return _meal_estimate_response(result)
 
 
 class MealEntryRequest(BaseModel):
