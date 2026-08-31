@@ -24,3 +24,6 @@ build/
 # Editor/OS
 .vscode/
 .DS_Store
+
+# Local dev server logs
+*.log
