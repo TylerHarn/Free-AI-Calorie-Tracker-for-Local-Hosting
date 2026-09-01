@@ -160,7 +160,7 @@ export default function AddMealManually({ onAdd }: { onAdd: (entry: MealEstimate
         <button
           type="submit"
           disabled={!foodName.trim() || calories.trim() === ""}
-          className="flex-1 rounded-full bg-ember py-2 font-sans text-sm font-semibold text-paper-raised transition hover:bg-ember/90 disabled:opacity-50"
+          className="flex-1 rounded-full bg-ember py-2 font-sans text-sm font-semibold text-cream transition hover:bg-ember/90 disabled:opacity-50"
         >
           Add
         </button>

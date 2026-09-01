@@ -11,6 +11,7 @@ A local fullstack application for tracking calories by photo, built for use on y
 - Edit or delete any logged entry, or add a food manually (with optional macros) without a photo — or hit "Estimate" to have the AI look up typical calories/macros for whatever you typed
 - Log workouts (pick an activity and duration) — calories burned are estimated from a MET-based formula and subtracted from the day's ring
 - Daily progress ring (net calories vs. goal), a protein/carbs/fat summary, and a receipt-style daily log mixing meals and workouts, per person (stored in SQLite)
+- Settings menu (top right) to update your fitness goals anytime, switch to dark mode, or switch users
 
 ## Tech Stack
 

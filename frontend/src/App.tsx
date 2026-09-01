@@ -7,6 +7,7 @@ import TrackerPage from "./components/TrackerPage";
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditingGoal, setIsEditingGoal] = useState(false);
 
   useEffect(() => {
     getMe()
@@ -23,9 +24,24 @@ export default function App() {
     return <LoginPage onSignedIn={setUser} />;
   }
 
-  if (user.daily_calorie_goal == null) {
-    return <SetupPage user={user} onComplete={setUser} />;
+  if (user.daily_calorie_goal == null || isEditingGoal) {
+    return (
+      <SetupPage
+        user={user}
+        onComplete={(updated) => {
+          setUser(updated);
+          setIsEditingGoal(false);
+        }}
+        onCancel={isEditingGoal ? () => setIsEditingGoal(false) : undefined}
+      />
+    );
   }
 
-  return <TrackerPage user={user} onSignOut={() => setUser(null)} />;
+  return (
+    <TrackerPage
+      user={user}
+      onSignOut={() => setUser(null)}
+      onEditGoal={() => setIsEditingGoal(true)}
+    />
+  );
 }

@@ -77,7 +77,7 @@ export default function LogWorkoutForm({
         <button
           type="submit"
           disabled={isEstimating || !activity || duration.trim() === ""}
-          className="flex-1 rounded-full bg-steel py-2 font-sans text-sm font-semibold text-paper-raised transition hover:bg-steel/90 disabled:opacity-50"
+          className="flex-1 rounded-full bg-steel py-2 font-sans text-sm font-semibold text-cream transition hover:bg-steel/90 disabled:opacity-50"
         >
           {isEstimating ? "Estimating…" : "Estimate"}
         </button>

@@ -3,6 +3,31 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: light;
+    --color-ink: 33 30 26;
+    --color-paper: 239 230 210;
+    --color-paper-raised: 255 253 247;
+    --color-ember: 225 89 44;
+    --color-sage: 89 117 79;
+    --color-rust: 166 58 46;
+    --color-steel: 63 108 116;
+  }
+
+  /* Not a naive inversion — the same "kitchen ticket" materials under different
+     lighting: light mode's paper background becomes dark mode's ink (text), and
+     every accent is brightened just enough to stay legible on the dark ground. */
+  .dark {
+    color-scheme: dark;
+    --color-ink: 243 236 221;
+    --color-paper: 26 23 20;
+    --color-paper-raised: 38 33 28;
+    --color-ember: 241 115 74;
+    --color-sage: 127 161 115;
+    --color-rust: 214 104 90;
+    --color-steel: 106 163 172;
+  }
+
   body {
     @apply bg-paper text-ink font-sans;
   }

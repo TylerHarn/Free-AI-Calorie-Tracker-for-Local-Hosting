@@ -47,7 +47,7 @@ export default function WorkoutResult({
           type="button"
           onClick={() => onAdd(parsedCalories)}
           disabled={isSaving || !isValid}
-          className="flex-1 rounded-full bg-steel py-2.5 font-sans text-sm font-semibold text-paper-raised transition hover:bg-steel/90 disabled:opacity-50"
+          className="flex-1 rounded-full bg-steel py-2.5 font-sans text-sm font-semibold text-cream transition hover:bg-steel/90 disabled:opacity-50"
         >
           {isSaving ? "Adding…" : "Add to log"}
         </button>

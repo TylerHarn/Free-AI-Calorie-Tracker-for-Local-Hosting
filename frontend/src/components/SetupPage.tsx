@@ -15,14 +15,40 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
   return <label className="mb-1.5 block font-mono text-[11px] uppercase tracking-widest text-ink/40">{children}</label>;
 }
 
-export default function SetupPage({ user, onComplete }: { user: User; onComplete: (user: User) => void }) {
-  const [sex, setSex] = useState<"male" | "female">("female");
-  const [age, setAge] = useState("");
-  const [heightFt, setHeightFt] = useState("");
-  const [heightIn, setHeightIn] = useState("");
-  const [weightLb, setWeightLb] = useState("");
-  const [activityLevel, setActivityLevel] = useState<ActivityLevel>("moderate");
-  const [weeklyLossRate, setWeeklyLossRate] = useState(1);
+function cmToFtIn(cm: number): { ft: number; inches: number } {
+  const totalInches = cm / 2.54;
+  let ft = Math.floor(totalInches / 12);
+  let inches = Math.round(totalInches - ft * 12);
+  if (inches === 12) {
+    ft += 1;
+    inches = 0;
+  }
+  return { ft, inches };
+}
+
+function kgToLb(kg: number): number {
+  return Math.round(kg / 0.45359237);
+}
+
+export default function SetupPage({
+  user,
+  onComplete,
+  onCancel,
+}: {
+  user: User;
+  onComplete: (user: User) => void;
+  onCancel?: () => void;
+}) {
+  const isEditing = user.daily_calorie_goal != null;
+  const prefillHeight = user.height_cm != null ? cmToFtIn(user.height_cm) : null;
+
+  const [sex, setSex] = useState<"male" | "female">(user.sex ?? "female");
+  const [age, setAge] = useState(user.age != null ? String(user.age) : "");
+  const [heightFt, setHeightFt] = useState(prefillHeight ? String(prefillHeight.ft) : "");
+  const [heightIn, setHeightIn] = useState(prefillHeight ? String(prefillHeight.inches) : "");
+  const [weightLb, setWeightLb] = useState(user.weight_kg != null ? String(kgToLb(user.weight_kg)) : "");
+  const [activityLevel, setActivityLevel] = useState<ActivityLevel>((user.activity_level as ActivityLevel) ?? "moderate");
+  const [weeklyLossRate, setWeeklyLossRate] = useState(user.weekly_loss_rate_lb ?? 1);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -65,8 +91,17 @@ export default function SetupPage({ user, onComplete }: { user: User; onComplete
       className="flex min-h-screen flex-col px-6 pt-[max(3rem,env(safe-area-inset-top))]"
     >
       <header className="mb-6">
-        <p className="font-mono text-xs uppercase tracking-widest text-ink/40">Order form</p>
-        <h1 className="mt-2 font-display text-3xl font-medium text-ink">Let's set {user.name}'s goal</h1>
+        <div className="flex items-center justify-between">
+          <p className="font-mono text-xs uppercase tracking-widest text-ink/40">Order form</p>
+          {isEditing && onCancel && (
+            <button type="button" onClick={onCancel} className="font-sans text-xs font-medium text-ink/50 hover:text-ink">
+              Cancel
+            </button>
+          )}
+        </div>
+        <h1 className="mt-2 font-display text-3xl font-medium text-ink">
+          {isEditing ? `Update ${user.name}'s goal` : `Let's set ${user.name}'s goal`}
+        </h1>
         <p className="mt-1 font-sans text-sm text-ink/60">
           We'll use this to calculate a daily calorie target for weight loss.
         </p>
@@ -176,9 +211,9 @@ export default function SetupPage({ user, onComplete }: { user: User; onComplete
         <button
           type="submit"
           disabled={isSaving}
-          className="w-full rounded-full bg-ember py-3.5 font-sans text-sm font-semibold text-paper-raised transition hover:bg-ember/90 disabled:opacity-50"
+          className="w-full rounded-full bg-ember py-3.5 font-sans text-sm font-semibold text-cream transition hover:bg-ember/90 disabled:opacity-50"
         >
-          {isSaving ? "Calculating…" : "Calculate my goal"}
+          {isSaving ? "Calculating…" : isEditing ? "Update my goal" : "Calculate my goal"}
         </button>
       </div>
     </form>

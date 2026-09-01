@@ -41,7 +41,7 @@ export default function PhotoCapture({ onEstimate, isEstimating }: PhotoCaptureP
           type="button"
           disabled={isEstimating}
           onClick={() => onEstimate(selectedBlob)}
-          className="shrink-0 rounded-full bg-ember px-4 py-2 font-sans text-sm font-semibold text-paper-raised transition hover:bg-ember/90 disabled:opacity-50"
+          className="shrink-0 rounded-full bg-ember px-4 py-2 font-sans text-sm font-semibold text-cream transition hover:bg-ember/90 disabled:opacity-50"
         >
           {isEstimating ? "Estimating…" : "Estimate"}
         </button>
@@ -55,7 +55,7 @@ export default function PhotoCapture({ onEstimate, isEstimating }: PhotoCaptureP
         type="button"
         onClick={() => fileInputRef.current?.click()}
         aria-label="Log a meal photo"
-        className="flex h-24 w-24 items-center justify-center rounded-full bg-ember text-paper-raised shadow-lg shadow-ember/30 transition active:scale-95"
+        className="flex h-24 w-24 items-center justify-center rounded-full bg-ember text-cream shadow-lg shadow-ember/30 transition active:scale-95"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-10 w-10">
           <path

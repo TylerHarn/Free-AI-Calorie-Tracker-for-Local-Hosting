@@ -25,6 +25,7 @@ import LogWorkoutForm from "./LogWorkoutForm";
 import MacroSummary from "./MacroSummary";
 import PhotoCapture from "./PhotoCapture";
 import ProgressBar from "./ProgressBar";
+import SettingsMenu from "./SettingsMenu";
 import WorkoutResult from "./WorkoutResult";
 
 function isToday(isoString: string) {
@@ -37,7 +38,15 @@ function isToday(isoString: string) {
   );
 }
 
-export default function TrackerPage({ user, onSignOut }: { user: User; onSignOut: () => void }) {
+export default function TrackerPage({
+  user,
+  onSignOut,
+  onEditGoal,
+}: {
+  user: User;
+  onSignOut: () => void;
+  onEditGoal: () => void;
+}) {
   const [pendingEstimate, setPendingEstimate] = useState<MealEstimate | null>(null);
   const [history, setHistory] = useState<Meal[]>([]);
   const [isEstimating, setIsEstimating] = useState(false);
@@ -197,13 +206,7 @@ export default function TrackerPage({ user, onSignOut }: { user: User; onSignOut
           <p className="font-mono text-[11px] uppercase tracking-widest text-ink/40">Calorie Tracker</p>
           <h1 className="font-display text-2xl font-medium text-ink">{user.name}</h1>
         </div>
-        <button
-          type="button"
-          onClick={handleSignOut}
-          className="rounded-full border border-ink/15 px-3 py-1.5 font-sans text-xs font-medium text-ink/60 hover:border-ink/30 hover:text-ink"
-        >
-          Switch
-        </button>
+        <SettingsMenu onEditGoal={onEditGoal} onSignOut={handleSignOut} />
       </header>
 
       {user.daily_calorie_goal != null && (

@@ -65,7 +65,7 @@ export default function CalorieResult({
           type="button"
           onClick={() => onAdd(parsedCalories)}
           disabled={isSaving || !isValid}
-          className="flex-1 rounded-full bg-ember py-2.5 font-sans text-sm font-semibold text-paper-raised transition hover:bg-ember/90 disabled:opacity-50"
+          className="flex-1 rounded-full bg-ember py-2.5 font-sans text-sm font-semibold text-cream transition hover:bg-ember/90 disabled:opacity-50"
         >
           {isSaving ? "Adding…" : "Add to log"}
         </button>
