@@ -34,14 +34,16 @@ export default function CalorieHistoryChart({ days, goal }: { days: DaySummary[]
         return (
           <g key={i}>
             <rect x={x} y={y} width={barWidth * 0.7} height={barHeight} rx={2} className={barColor(day.net)} />
-            <text
-              x={x + (barWidth * 0.7) / 2}
-              y={HEIGHT - 4}
-              textAnchor="middle"
-              className="fill-ink/40 font-mono text-[8px]"
-            >
-              {day.dateLabel}
-            </text>
+            {(days.length - 1 - i) % 2 === 0 && (
+              <text
+                x={x + (barWidth * 0.7) / 2}
+                y={HEIGHT - 4}
+                textAnchor="middle"
+                className="fill-ink/40 font-mono text-[8px]"
+              >
+                {day.dateLabel}
+              </text>
+            )}
           </g>
         );
       })}
