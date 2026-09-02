@@ -17,7 +17,7 @@ function EditIcon() {
 function BarcodeIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-      <path d="M3 5v14M7 5v14M10 5v14M13 5v14M15.5 5v14M19 5v14M21 5v14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M3 5v14M8 5v14M12 5v14M17 5v14M21 5v14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 }

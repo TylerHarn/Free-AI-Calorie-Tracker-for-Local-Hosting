@@ -114,7 +114,7 @@ function LogRow({
     <li className="flex gap-3 border-b border-dotted border-ink/15 py-3 first:pt-0 last:border-b-0">
       <span
         aria-hidden="true"
-        className={`w-1 shrink-0 self-stretch rounded-full ${isWorkout ? "bg-steel/50" : "bg-ember/50"}`}
+        className={`h-8 w-1 shrink-0 self-center rounded-full ${isWorkout ? "bg-steel/50" : "bg-ember/50"}`}
       />
 
       <div className="min-w-0 flex-1">

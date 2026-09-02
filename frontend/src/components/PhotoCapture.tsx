@@ -59,11 +59,13 @@ export default function PhotoCapture({ onEstimate, isEstimating }: PhotoCaptureP
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-10 w-10">
           <path
-            d="M4 8a2 2 0 0 1 2-2h1.2a1 1 0 0 0 .8-.4l.8-1.2a1 1 0 0 1 .8-.4h4.8a1 1 0 0 1 .8.4l.8 1.2a1 1 0 0 0 .8.4H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z"
+            d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
             stroke="currentColor"
             strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
-          <circle cx="12" cy="13" r="3.5" stroke="currentColor" strokeWidth="1.8" />
+          <circle cx="12" cy="13" r="4" stroke="currentColor" strokeWidth="1.8" />
         </svg>
       </button>
       <p className="font-sans text-sm font-medium text-ink/70">Log a meal</p>
