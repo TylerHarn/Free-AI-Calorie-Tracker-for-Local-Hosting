@@ -248,7 +248,7 @@ export default function TrackerPage({
     <div className="mx-auto min-h-screen max-w-lg px-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-16">
       <header className="mb-6 flex items-center justify-between">
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-widest text-ink/40">Calorie Tracker</p>
+          <p className="font-mono text-[11px] tracking-wide text-ink/40">Calorie tracker</p>
           <h1 className="font-display text-2xl font-medium text-ink">{user.name}</h1>
         </div>
         <div className="flex items-center gap-2">
@@ -348,7 +348,7 @@ export default function TrackerPage({
 
       <section>
         <div className="mb-2 flex items-center justify-between">
-          <h2 className="font-mono text-[11px] uppercase tracking-widest text-ink/40">Today's ticket</h2>
+          <h2 className="font-mono text-[11px] tracking-wide text-ink/40">Today's ticket</h2>
           <span className="font-mono text-[11px] text-ink/40">
             {totalItems} item{totalItems === 1 ? "" : "s"}
           </span>

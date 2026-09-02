@@ -27,7 +27,7 @@ export default function CalorieResult({
 
   return (
     <div className="rounded-2xl border border-dashed border-ink/25 bg-paper-raised p-5">
-      <p className="font-mono text-[11px] uppercase tracking-widest text-ink/40">On the ticket</p>
+      <p className="font-mono text-[11px] tracking-wide text-ink/40">On the ticket</p>
       <p className="mt-1 font-display text-xl font-medium text-ink">{estimate.food_name}</p>
 
       <div className="mt-3 flex items-baseline gap-1">

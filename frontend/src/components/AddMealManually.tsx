@@ -113,7 +113,7 @@ export default function AddMealManually({
       />
 
       <div>
-        <p className="mb-1 font-mono text-[11px] uppercase tracking-widest text-ink/40">Macros (optional)</p>
+        <p className="mb-1 font-mono text-[11px] tracking-wide text-ink/40">Macros (optional)</p>
         <div className="flex gap-2">
           <input
             type="number"

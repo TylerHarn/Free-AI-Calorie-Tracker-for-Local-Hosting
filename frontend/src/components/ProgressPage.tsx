@@ -110,7 +110,7 @@ export default function ProgressPage({ user, onBack }: { user: User; onBack: () 
           </svg>
         </button>
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-widest text-ink/40">{user.name}</p>
+          <p className="font-mono text-[11px] tracking-wide text-ink/40">{user.name}</p>
           <h1 className="font-display text-2xl font-medium text-ink">Progress</h1>
         </div>
       </header>
@@ -119,7 +119,7 @@ export default function ProgressPage({ user, onBack }: { user: User; onBack: () 
 
       <section className="mb-10">
         <div className="mb-2 flex items-center justify-between">
-          <h2 className="font-mono text-[11px] uppercase tracking-widest text-ink/40">Weight</h2>
+          <h2 className="font-mono text-[11px] tracking-wide text-ink/40">Weight</h2>
           {latestWeight != null && (
             <span className="font-mono text-sm font-semibold text-ink">{latestWeight}lb</span>
           )}
@@ -180,7 +180,7 @@ export default function ProgressPage({ user, onBack }: { user: User; onBack: () 
       </section>
 
       <section>
-        <h2 className="mb-2 font-mono text-[11px] uppercase tracking-widest text-ink/40">
+        <h2 className="mb-2 font-mono text-[11px] tracking-wide text-ink/40">
           Last {HISTORY_DAYS} days
         </h2>
         <div className="rounded-2xl border border-ink/10 bg-paper-raised p-4">

@@ -12,7 +12,7 @@ const ACTIVITY_OPTIONS: { value: ActivityLevel; label: string }[] = [
 const LOSS_RATE_OPTIONS = [0.5, 1, 1.5, 2];
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
-  return <label className="mb-1.5 block font-mono text-[11px] uppercase tracking-widest text-ink/40">{children}</label>;
+  return <label className="mb-1.5 block font-mono text-[11px] tracking-wide text-ink/40">{children}</label>;
 }
 
 function cmToFtIn(cm: number): { ft: number; inches: number } {
@@ -96,7 +96,7 @@ export default function SetupPage({
     >
       <header className="mb-6">
         <div className="flex items-center justify-between">
-          <p className="font-mono text-xs uppercase tracking-widest text-ink/40">Order form</p>
+          <p className="font-mono text-xs tracking-wide text-ink/40">Order form</p>
           {isEditing && onCancel && (
             <button type="button" onClick={onCancel} className="font-sans text-xs font-medium text-ink/50 hover:text-ink">
               Cancel

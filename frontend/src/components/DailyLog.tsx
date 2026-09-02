@@ -111,76 +111,87 @@ function LogRow({
   }
 
   return (
-    <li className="border-b border-dotted border-ink/20 py-3 first:pt-0 last:border-b-0">
-      <div className="flex items-center gap-3">
-        <div className="min-w-0 flex-1">
-          <p className={`truncate font-sans text-sm ${isWorkout ? "text-steel" : "text-ink"}`}>{entry.name}</p>
-          <p className="font-mono text-[11px] text-ink/40">{formatDate(entry.created_at)}</p>
-        </div>
+    <li className="flex gap-3 border-b border-dotted border-ink/15 py-3 first:pt-0 last:border-b-0">
+      <span
+        aria-hidden="true"
+        className={`w-1 shrink-0 self-stretch rounded-full ${isWorkout ? "bg-steel/50" : "bg-ember/50"}`}
+      />
 
-        {isEditing ? (
-          <div className="flex shrink-0 items-center gap-2">
-            <input
-              type="number"
-              min={0}
-              autoFocus
-              value={draftCalories}
-              onChange={(e) => setDraftCalories(e.target.value)}
-              className="w-20 rounded-md border border-ink/20 bg-paper px-2 py-1 text-right font-mono text-sm focus:border-ember focus:outline-none"
-            />
-            <button type="button" onClick={handleSave} className="font-sans text-xs font-semibold text-sage">
-              Save
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setDraftCalories(String(entry.calories));
-                setIsEditing(false);
-              }}
-              className="font-sans text-xs font-medium text-ink/40"
-            >
-              Cancel
-            </button>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className={`truncate font-sans text-sm ${isWorkout ? "text-steel" : "text-ink"}`}>{entry.name}</p>
+            <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1">
+              <span className="font-mono text-[11px] text-ink/40">{formatDate(entry.created_at)}</span>
+              {entry.kind === "meal" && onUpdateMacros && (
+                <>
+                  <span className="font-mono text-[11px] text-ink/25">·</span>
+                  <MacroLine id={entry.id} macros={entry.macros} onUpdateMacros={onUpdateMacros} />
+                </>
+              )}
+            </div>
           </div>
-        ) : (
-          <div className="flex shrink-0 items-center gap-1">
-            <button
-              type="button"
-              onClick={() => setIsEditing(true)}
-              className={`min-h-11 rounded-lg px-2 font-mono text-sm font-semibold tabular-nums ${
-                isWorkout ? "text-steel hover:text-steel/70" : "text-ink hover:text-ember"
-              }`}
-              title="Edit calories"
-            >
-              {isWorkout ? `−${entry.calories}` : entry.calories}
-            </button>
-            {onSaveFavorite && (
+
+          {isEditing ? (
+            <div className="flex shrink-0 items-center gap-2">
+              <input
+                type="number"
+                min={0}
+                autoFocus
+                value={draftCalories}
+                onChange={(e) => setDraftCalories(e.target.value)}
+                className="w-20 rounded-md border border-ink/20 bg-paper px-2 py-1 text-right font-mono text-sm focus:border-ember focus:outline-none"
+              />
+              <button type="button" onClick={handleSave} className="font-sans text-xs font-semibold text-sage">
+                Save
+              </button>
               <button
                 type="button"
-                onClick={onSaveFavorite}
-                className="flex h-11 w-11 items-center justify-center rounded-full text-lg text-ink/30 hover:bg-ember/10 hover:text-ember"
-                title="Save as favorite"
-                aria-label="Save as favorite"
+                onClick={() => {
+                  setDraftCalories(String(entry.calories));
+                  setIsEditing(false);
+                }}
+                className="font-sans text-xs font-medium text-ink/40"
               >
-                ☆
+                Cancel
               </button>
-            )}
-            <button
-              type="button"
-              onClick={() => onDelete(entry.id)}
-              className="flex h-11 w-11 items-center justify-center rounded-full text-lg text-ink/30 hover:bg-rust/10 hover:text-rust"
-              title="Delete entry"
-              aria-label="Delete entry"
-            >
-              ✕
-            </button>
-          </div>
-        )}
+            </div>
+          ) : (
+            <div className="flex shrink-0 items-center">
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className={`min-h-11 rounded-lg px-2 font-mono text-sm font-semibold tabular-nums ${
+                  isWorkout ? "text-steel hover:text-steel/70" : "text-ink hover:text-ember"
+                }`}
+                title="Edit calories"
+              >
+                {isWorkout ? `−${entry.calories}` : entry.calories}
+              </button>
+              {onSaveFavorite && (
+                <button
+                  type="button"
+                  onClick={onSaveFavorite}
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-base text-ink/25 hover:bg-ember/10 hover:text-ember"
+                  title="Save as favorite"
+                  aria-label="Save as favorite"
+                >
+                  ☆
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => onDelete(entry.id)}
+                className="flex h-9 w-9 items-center justify-center rounded-full text-base text-ink/25 hover:bg-rust/10 hover:text-rust"
+                title="Delete entry"
+                aria-label="Delete entry"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-
-      {entry.kind === "meal" && onUpdateMacros && (
-        <MacroLine id={entry.id} macros={entry.macros} onUpdateMacros={onUpdateMacros} />
-      )}
     </li>
   );
 }
@@ -217,7 +228,7 @@ function MacroLine({
 
   if (isEditing) {
     return (
-      <div className="mt-2 flex items-center gap-1.5">
+      <div className="mt-1 flex w-full basis-full flex-wrap items-center gap-1.5">
         <input
           type="number"
           min={0}
@@ -268,7 +279,7 @@ function MacroLine({
     <button
       type="button"
       onClick={() => setIsEditing(true)}
-      className="mt-1 block font-mono text-[11px] text-ink/45 hover:text-ember"
+      className="font-mono text-[11px] font-medium text-ember/80 hover:text-ember"
     >
       P {macros.protein_g}g · C {macros.carbs_g}g · F {macros.fat_g}g
     </button>

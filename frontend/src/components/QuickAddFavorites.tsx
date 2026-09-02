@@ -14,7 +14,7 @@ export default function QuickAddFavorites({
   return (
     <div className="rounded-2xl border border-ink/10 bg-paper-raised p-4">
       <div className="mb-2 flex items-center justify-between">
-        <p className="font-mono text-[11px] uppercase tracking-widest text-ink/40">Favorites</p>
+        <p className="font-mono text-[11px] tracking-wide text-ink/40">Favorites</p>
         <button type="button" onClick={onClose} className="font-sans text-xs font-medium text-ink/50 hover:text-ink">
           Close
         </button>

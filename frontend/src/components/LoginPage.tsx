@@ -46,7 +46,7 @@ export default function LoginPage({ onSignedIn }: { onSignedIn: (user: User) => 
   return (
     <div className="flex min-h-screen flex-col px-6 pt-[max(3rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
       <header className="mb-8">
-        <p className="font-mono text-xs uppercase tracking-widest text-ink/40">Calorie Tracker</p>
+        <p className="font-mono text-xs tracking-wide text-ink/40">Calorie tracker</p>
         <h1 className="mt-2 font-display text-4xl font-medium text-ink">Who's eating?</h1>
       </header>
 
@@ -61,7 +61,7 @@ export default function LoginPage({ onSignedIn }: { onSignedIn: (user: User) => 
           >
             <span className="font-display text-lg text-ink">{member.name}</span>
             {!member.setup_complete && (
-              <span className="font-mono text-[11px] uppercase tracking-wide text-ink/35">setup needed</span>
+              <span className="font-mono text-[11px] tracking-wide text-ink/35">Setup needed</span>
             )}
           </button>
         ))}
