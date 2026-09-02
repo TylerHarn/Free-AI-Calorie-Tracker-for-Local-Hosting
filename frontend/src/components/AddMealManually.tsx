@@ -9,8 +9,13 @@ function parseOptionalNumber(value: string): number {
 
 const DEFAULT_DESCRIPTION = "Manually logged";
 
-export default function AddMealManually({ onAdd }: { onAdd: (entry: MealEstimate) => void }) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function AddMealManually({
+  onAdd,
+  onClose,
+}: {
+  onAdd: (entry: MealEstimate) => void;
+  onClose: () => void;
+}) {
   const [foodName, setFoodName] = useState("");
   const [calories, setCalories] = useState("");
   const [protein, setProtein] = useState("");
@@ -30,7 +35,6 @@ export default function AddMealManually({ onAdd }: { onAdd: (entry: MealEstimate
     setDescription(DEFAULT_DESCRIPTION);
     setConfidence("manual");
     setEstimateError(null);
-    setIsOpen(false);
   }
 
   async function handleEstimate() {
@@ -70,18 +74,7 @@ export default function AddMealManually({ onAdd }: { onAdd: (entry: MealEstimate
     });
 
     reset();
-  }
-
-  if (!isOpen) {
-    return (
-      <button
-        type="button"
-        onClick={() => setIsOpen(true)}
-        className="w-full py-2 text-center font-sans text-sm font-medium text-ink/50 underline decoration-dotted underline-offset-4 hover:text-ember"
-      >
-        + Add a food by hand
-      </button>
-    );
+    onClose();
   }
 
   return (
@@ -152,7 +145,10 @@ export default function AddMealManually({ onAdd }: { onAdd: (entry: MealEstimate
       <div className="flex gap-2 pt-1">
         <button
           type="button"
-          onClick={reset}
+          onClick={() => {
+            reset();
+            onClose();
+          }}
           className="flex-1 rounded-full border border-ink/15 py-2 font-sans text-sm font-medium text-ink/70 hover:bg-ink/5"
         >
           Cancel

@@ -29,6 +29,7 @@ import LogWorkoutForm from "./LogWorkoutForm";
 import MacroSummary from "./MacroSummary";
 import PhotoCapture from "./PhotoCapture";
 import ProgressBar from "./ProgressBar";
+import QuickActionsGrid, { type QuickAction } from "./QuickActionsGrid";
 import QuickAddFavorites from "./QuickAddFavorites";
 import ScanBarcode from "./ScanBarcode";
 import SettingsMenu from "./SettingsMenu";
@@ -59,7 +60,7 @@ export default function TrackerPage({
   const [history, setHistory] = useState<Meal[]>([]);
   const [isEstimating, setIsEstimating] = useState(false);
   const [isSavingEstimate, setIsSavingEstimate] = useState(false);
-  const [isScanningBarcode, setIsScanningBarcode] = useState(false);
+  const [activeAction, setActiveAction] = useState<QuickAction | null>(null);
 
   const [pendingWorkout, setPendingWorkout] = useState<WorkoutEstimate | null>(null);
   const [workouts, setWorkouts] = useState<Workout[]>([]);
@@ -305,20 +306,33 @@ export default function TrackerPage({
         </div>
       )}
 
-      <div className="mb-3">
-        <AddMealManually onAdd={handleAddEntry} />
-      </div>
-
-      <div className="mb-3">
-        <ScanBarcode onFound={setPendingEstimate} isLoading={isScanningBarcode} setIsLoading={setIsScanningBarcode} />
-      </div>
-
-      <div className="mb-3">
-        <QuickAddFavorites favorites={favorites} onAdd={handleAddEntry} onDelete={handleDeleteFavorite} />
-      </div>
-
       <div className="mb-6">
-        <LogWorkoutForm onEstimate={handleEstimateWorkout} isEstimating={isEstimatingWorkout} />
+        {activeAction === null && <QuickActionsGrid onSelect={setActiveAction} />}
+
+        {activeAction === "manual" && (
+          <AddMealManually onAdd={handleAddEntry} onClose={() => setActiveAction(null)} />
+        )}
+
+        {activeAction === "barcode" && (
+          <ScanBarcode onFound={setPendingEstimate} onClose={() => setActiveAction(null)} />
+        )}
+
+        {activeAction === "favorites" && (
+          <QuickAddFavorites
+            favorites={favorites}
+            onAdd={handleAddEntry}
+            onDelete={handleDeleteFavorite}
+            onClose={() => setActiveAction(null)}
+          />
+        )}
+
+        {activeAction === "workout" && (
+          <LogWorkoutForm
+            onEstimate={handleEstimateWorkout}
+            isEstimating={isEstimatingWorkout}
+            onClose={() => setActiveAction(null)}
+          />
+        )}
       </div>
 
       {pendingWorkout && (

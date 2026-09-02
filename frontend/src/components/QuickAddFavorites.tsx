@@ -1,34 +1,21 @@
-import { useState } from "react";
 import type { Favorite } from "../api";
 
 export default function QuickAddFavorites({
   favorites,
   onAdd,
   onDelete,
+  onClose,
 }: {
   favorites: Favorite[];
   onAdd: (favorite: Favorite) => void;
   onDelete: (id: number) => void;
+  onClose: () => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  if (!isOpen) {
-    return (
-      <button
-        type="button"
-        onClick={() => setIsOpen(true)}
-        className="w-full py-2 text-center font-sans text-sm font-medium text-ink/50 underline decoration-dotted underline-offset-4 hover:text-ember"
-      >
-        + Quick add from favorites
-      </button>
-    );
-  }
-
   return (
     <div className="rounded-2xl border border-ink/10 bg-paper-raised p-4">
       <div className="mb-2 flex items-center justify-between">
         <p className="font-mono text-[11px] uppercase tracking-widest text-ink/40">Favorites</p>
-        <button type="button" onClick={() => setIsOpen(false)} className="font-sans text-xs font-medium text-ink/50 hover:text-ink">
+        <button type="button" onClick={onClose} className="font-sans text-xs font-medium text-ink/50 hover:text-ink">
           Close
         </button>
       </div>
