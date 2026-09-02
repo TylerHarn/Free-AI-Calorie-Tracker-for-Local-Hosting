@@ -6,6 +6,7 @@ const CONFIDENCE_STYLES: Record<Confidence, string> = {
   medium: "bg-ember/15 text-ember",
   low: "bg-rust/15 text-rust",
   manual: "bg-ink/10 text-ink/60",
+  barcode: "bg-steel/15 text-steel",
 };
 
 export default function CalorieResult({

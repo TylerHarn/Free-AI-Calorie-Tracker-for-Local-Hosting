@@ -9,8 +9,11 @@ A local fullstack application for tracking calories by photo, built for use on y
 - Log a meal photo with your phone's native camera/library picker
 - Calorie and macro (protein/carbs/fat) estimate and food identification via Cohere's vision API — review and adjust before it's added to your log
 - Edit or delete any logged entry, or add a food manually (with optional macros) without a photo — or hit "Estimate" to have the AI look up typical calories/macros for whatever you typed
+- Scan a barcode to log packaged foods with exact nutrition from Open Food Facts, instead of an AI estimate
+- Star any logged meal as a favorite for one-tap re-logging later
 - Log workouts (pick an activity and duration) — calories burned are estimated from a MET-based formula and subtracted from the day's ring
 - Daily progress ring (net calories vs. goal), a protein/carbs/fat summary, and a receipt-style daily log mixing meals and workouts, per person (stored in SQLite)
+- Progress page: log your weight over time (with an optional goal weight) and see a 14-day calorie history
 - Settings menu (top right) to update your fitness goals anytime, switch to dark mode, or switch users
 
 ## Tech Stack
@@ -18,7 +21,8 @@ A local fullstack application for tracking calories by photo, built for use on y
 - **Frontend:** React (Vite, TypeScript)
 - **Backend:** Python (FastAPI)
 - **Database:** SQLite (local)
-- **AI:** Cohere API (image/vision) for food identification
+- **AI:** Cohere API (image/vision and text) for food identification and nutrition estimates
+- **Barcode data:** Open Food Facts API (free, no key required)
 
 ## Getting Started
 

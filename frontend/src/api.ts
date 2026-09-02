@@ -1,4 +1,4 @@
-export type Confidence = "low" | "medium" | "high" | "manual";
+export type Confidence = "low" | "medium" | "high" | "manual" | "barcode";
 
 export interface MealEstimate {
   food_name: string;
@@ -47,6 +47,7 @@ export interface User {
   activity_level: string | null;
   weekly_loss_rate_lb: number | null;
   daily_calorie_goal: number | null;
+  goal_weight_lb: number | null;
 }
 
 export type ActivityLevel = "sedentary" | "light" | "moderate" | "very_active" | "extra_active";
@@ -59,6 +60,18 @@ export interface SetupPayload {
   weight_lb: number;
   activity_level: ActivityLevel;
   weekly_loss_rate_lb: number;
+  goal_weight_lb?: number;
+}
+
+export interface WeighIn {
+  id: number;
+  weight_lb: number;
+  created_at: string;
+}
+
+export interface Favorite extends MealEstimate {
+  id: number;
+  created_at: string;
 }
 
 async function parseErrorMessage(response: Response): Promise<string> {
@@ -202,4 +215,48 @@ export function deleteWorkout(id: number): Promise<{ ok: boolean }> {
 
 export function getWorkoutHistory(): Promise<Workout[]> {
   return request("/api/workouts");
+}
+
+export function lookupBarcode(barcode: string): Promise<MealEstimate> {
+  return request(`/api/meals/lookup-barcode/${encodeURIComponent(barcode)}`);
+}
+
+export function addWeighIn(weightLb: number): Promise<WeighIn> {
+  return request("/api/weigh-ins", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ weight_lb: weightLb }),
+  });
+}
+
+export function updateWeighIn(id: number, weightLb: number): Promise<WeighIn> {
+  return request(`/api/weigh-ins/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ weight_lb: weightLb }),
+  });
+}
+
+export function deleteWeighIn(id: number): Promise<{ ok: boolean }> {
+  return request(`/api/weigh-ins/${id}`, { method: "DELETE" });
+}
+
+export function getWeighIns(): Promise<WeighIn[]> {
+  return request("/api/weigh-ins");
+}
+
+export function addFavorite(entry: MealEstimate): Promise<Favorite> {
+  return request("/api/favorites", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(entry),
+  });
+}
+
+export function deleteFavorite(id: number): Promise<{ ok: boolean }> {
+  return request(`/api/favorites/${id}`, { method: "DELETE" });
+}
+
+export function getFavorites(): Promise<Favorite[]> {
+  return request("/api/favorites");
 }

@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react";
 import {
+  addFavorite,
   addMeal,
   addWorkout,
+  deleteFavorite,
   deleteMeal,
   deleteWorkout,
   estimateMeal,
   estimateWorkout,
+  getFavorites,
   getMealHistory,
   getWorkoutHistory,
   logout,
   updateMealCalories,
   updateMealMacros,
   updateWorkoutCalories,
+  type Favorite,
   type Meal,
   type MealEstimate,
   type User,
@@ -25,6 +29,8 @@ import LogWorkoutForm from "./LogWorkoutForm";
 import MacroSummary from "./MacroSummary";
 import PhotoCapture from "./PhotoCapture";
 import ProgressBar from "./ProgressBar";
+import QuickAddFavorites from "./QuickAddFavorites";
+import ScanBarcode from "./ScanBarcode";
 import SettingsMenu from "./SettingsMenu";
 import WorkoutResult from "./WorkoutResult";
 
@@ -42,20 +48,25 @@ export default function TrackerPage({
   user,
   onSignOut,
   onEditGoal,
+  onShowProgress,
 }: {
   user: User;
   onSignOut: () => void;
   onEditGoal: () => void;
+  onShowProgress: () => void;
 }) {
   const [pendingEstimate, setPendingEstimate] = useState<MealEstimate | null>(null);
   const [history, setHistory] = useState<Meal[]>([]);
   const [isEstimating, setIsEstimating] = useState(false);
   const [isSavingEstimate, setIsSavingEstimate] = useState(false);
+  const [isScanningBarcode, setIsScanningBarcode] = useState(false);
 
   const [pendingWorkout, setPendingWorkout] = useState<WorkoutEstimate | null>(null);
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [isEstimatingWorkout, setIsEstimatingWorkout] = useState(false);
   const [isSavingWorkout, setIsSavingWorkout] = useState(false);
+
+  const [favorites, setFavorites] = useState<Favorite[]>([]);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -66,6 +77,11 @@ export default function TrackerPage({
     getWorkoutHistory()
       .then(setWorkouts)
       .catch((err) => setError(err instanceof Error ? err.message : "Could not load your workout history."));
+    getFavorites()
+      .then(setFavorites)
+      .catch(() => {
+        // favorites are a nice-to-have; ignore load failures
+      });
   }, []);
 
   async function handleEstimate(image: Blob) {
@@ -179,6 +195,34 @@ export default function TrackerPage({
     }
   }
 
+  async function handleSaveFavorite(meal: Meal) {
+    try {
+      const favorite = await addFavorite({
+        food_name: meal.food_name,
+        description: meal.description,
+        estimated_calories: meal.estimated_calories,
+        confidence: meal.confidence,
+        protein_g: meal.protein_g,
+        carbs_g: meal.carbs_g,
+        fat_g: meal.fat_g,
+      });
+      setFavorites((prev) => [favorite, ...prev]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    }
+  }
+
+  async function handleDeleteFavorite(id: number) {
+    const previous = favorites;
+    setFavorites((prev) => prev.filter((f) => f.id !== id));
+    try {
+      await deleteFavorite(id);
+    } catch (err) {
+      setFavorites(previous);
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    }
+  }
+
   async function handleSignOut() {
     await logout().catch(() => {});
     onSignOut();
@@ -206,7 +250,32 @@ export default function TrackerPage({
           <p className="font-mono text-[11px] uppercase tracking-widest text-ink/40">Calorie Tracker</p>
           <h1 className="font-display text-2xl font-medium text-ink">{user.name}</h1>
         </div>
-        <SettingsMenu onEditGoal={onEditGoal} onSignOut={handleSignOut} />
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onShowProgress}
+            aria-label="View progress"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-ink/15 text-ink/60 transition hover:border-ink/30 hover:text-ink"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+              <polyline
+                points="23 6 13.5 15.5 8.5 10.5 1 18"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <polyline
+                points="17 6 23 6 23 12"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <SettingsMenu onEditGoal={onEditGoal} onSignOut={handleSignOut} />
+        </div>
       </header>
 
       {user.daily_calorie_goal != null && (
@@ -240,6 +309,14 @@ export default function TrackerPage({
         <AddMealManually onAdd={handleAddEntry} />
       </div>
 
+      <div className="mb-3">
+        <ScanBarcode onFound={setPendingEstimate} isLoading={isScanningBarcode} setIsLoading={setIsScanningBarcode} />
+      </div>
+
+      <div className="mb-3">
+        <QuickAddFavorites favorites={favorites} onAdd={handleAddEntry} onDelete={handleDeleteFavorite} />
+      </div>
+
       <div className="mb-6">
         <LogWorkoutForm onEstimate={handleEstimateWorkout} isEstimating={isEstimatingWorkout} />
       </div>
@@ -268,6 +345,7 @@ export default function TrackerPage({
             workouts={workouts}
             onUpdateMealCalories={handleUpdateCalories}
             onUpdateMealMacros={handleUpdateMacros}
+            onSaveFavorite={handleSaveFavorite}
             onDeleteMeal={handleDelete}
             onUpdateWorkoutCalories={handleUpdateWorkoutCalories}
             onDeleteWorkout={handleDeleteWorkout}

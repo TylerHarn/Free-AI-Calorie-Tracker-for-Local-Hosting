@@ -22,12 +22,13 @@ interface DailyLogProps {
   onUpdateMealCalories: (id: number, calories: number) => void;
   onUpdateMealMacros: (id: number, macros: Macros) => void;
   onDeleteMeal: (id: number) => void;
+  onSaveFavorite: (meal: Meal) => void;
   onUpdateWorkoutCalories: (id: number, calories: number) => void;
   onDeleteWorkout: (id: number) => void;
 }
 
 type Entry =
-  | { kind: "meal"; id: number; name: string; calories: number; macros: Macros; created_at: string }
+  | { kind: "meal"; id: number; name: string; calories: number; macros: Macros; created_at: string; raw: Meal }
   | { kind: "workout"; id: number; name: string; calories: number; macros: null; created_at: string };
 
 export default function DailyLog({
@@ -36,6 +37,7 @@ export default function DailyLog({
   onUpdateMealCalories,
   onUpdateMealMacros,
   onDeleteMeal,
+  onSaveFavorite,
   onUpdateWorkoutCalories,
   onDeleteWorkout,
 }: DailyLogProps) {
@@ -48,6 +50,7 @@ export default function DailyLog({
         calories: meal.estimated_calories,
         macros: { protein_g: meal.protein_g, carbs_g: meal.carbs_g, fat_g: meal.fat_g },
         created_at: meal.created_at,
+        raw: meal,
       })
     ),
     ...workouts.map(
@@ -75,6 +78,7 @@ export default function DailyLog({
           onUpdateCalories={entry.kind === "meal" ? onUpdateMealCalories : onUpdateWorkoutCalories}
           onUpdateMacros={entry.kind === "meal" ? onUpdateMealMacros : undefined}
           onDelete={entry.kind === "meal" ? onDeleteMeal : onDeleteWorkout}
+          onSaveFavorite={entry.kind === "meal" ? () => onSaveFavorite(entry.raw) : undefined}
         />
       ))}
     </ul>
@@ -86,11 +90,13 @@ function LogRow({
   onUpdateCalories,
   onUpdateMacros,
   onDelete,
+  onSaveFavorite,
 }: {
   entry: Entry;
   onUpdateCalories: (id: number, calories: number) => void;
   onUpdateMacros?: (id: number, macros: Macros) => void;
   onDelete: (id: number) => void;
+  onSaveFavorite?: () => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [draftCalories, setDraftCalories] = useState(String(entry.calories));
@@ -148,6 +154,17 @@ function LogRow({
             >
               {isWorkout ? `−${entry.calories}` : entry.calories}
             </button>
+            {onSaveFavorite && (
+              <button
+                type="button"
+                onClick={onSaveFavorite}
+                className="flex h-11 w-11 items-center justify-center rounded-full text-lg text-ink/30 hover:bg-ember/10 hover:text-ember"
+                title="Save as favorite"
+                aria-label="Save as favorite"
+              >
+                ☆
+              </button>
+            )}
             <button
               type="button"
               onClick={() => onDelete(entry.id)}

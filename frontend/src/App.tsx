@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getMe, type User } from "./api";
 import LoginPage from "./components/LoginPage";
+import ProgressPage from "./components/ProgressPage";
 import SetupPage from "./components/SetupPage";
 import TrackerPage from "./components/TrackerPage";
 
@@ -8,6 +9,7 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditingGoal, setIsEditingGoal] = useState(false);
+  const [showProgress, setShowProgress] = useState(false);
 
   useEffect(() => {
     getMe()
@@ -37,11 +39,16 @@ export default function App() {
     );
   }
 
+  if (showProgress) {
+    return <ProgressPage user={user} onBack={() => setShowProgress(false)} />;
+  }
+
   return (
     <TrackerPage
       user={user}
       onSignOut={() => setUser(null)}
       onEditGoal={() => setIsEditingGoal(true)}
+      onShowProgress={() => setShowProgress(true)}
     />
   );
 }

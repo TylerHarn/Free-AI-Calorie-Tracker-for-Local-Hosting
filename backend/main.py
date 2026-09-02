@@ -14,6 +14,7 @@ from calorie_calc import (
     list_activities,
 )
 from cohere_client import CohereEstimationError, estimate_calories, estimate_from_name
+from food_lookup import FoodLookupError, lookup_barcode
 
 load_dotenv()
 
@@ -71,6 +72,25 @@ def _row_to_user(row) -> dict:
         "activity_level": row["activity_level"],
         "weekly_loss_rate_lb": row["weekly_loss_rate_lb"],
         "daily_calorie_goal": row["daily_calorie_goal"],
+        "goal_weight_lb": row["goal_weight_lb"],
+    }
+
+
+def _row_to_weigh_in(row) -> dict:
+    return {"id": row["id"], "weight_lb": row["weight_lb"], "created_at": row["created_at"]}
+
+
+def _row_to_favorite(row) -> dict:
+    return {
+        "id": row["id"],
+        "food_name": row["food_name"],
+        "description": row["description"],
+        "estimated_calories": row["estimated_calories"],
+        "confidence": row["confidence"],
+        "protein_g": row["protein_g"],
+        "carbs_g": row["carbs_g"],
+        "fat_g": row["fat_g"],
+        "created_at": row["created_at"],
     }
 
 
@@ -137,6 +157,7 @@ class SetupRequest(BaseModel):
     weight_lb: float
     activity_level: str
     weekly_loss_rate_lb: float
+    goal_weight_lb: float | None = None
 
 
 @app.post("/api/users/me/setup")
@@ -165,6 +186,7 @@ def setup_user(body: SetupRequest, current_user=Depends(get_current_user)) -> di
         activity_level=body.activity_level,
         weekly_loss_rate_lb=body.weekly_loss_rate_lb,
         daily_calorie_goal=goal,
+        goal_weight_lb=body.goal_weight_lb,
     )
     return _row_to_user(row)
 
@@ -212,6 +234,16 @@ def estimate_meal_from_name(body: MealNameEstimateRequest, current_user=Depends(
         result = estimate_from_name(food_name)
     except CohereEstimationError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    return _meal_estimate_response(result)
+
+
+@app.get("/api/meals/lookup-barcode/{barcode}")
+def lookup_meal_barcode(barcode: str, current_user=Depends(get_current_user)) -> dict:
+    try:
+        result = lookup_barcode(barcode)
+    except FoodLookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
     return _meal_estimate_response(result)
 
@@ -335,3 +367,72 @@ def remove_workout(workout_id: int, current_user=Depends(get_current_user)) -> d
 @app.get("/api/workouts")
 def get_workouts(current_user=Depends(get_current_user)) -> list[dict]:
     return [_row_to_workout(row) for row in db.list_workouts(current_user["id"])]
+
+
+class WeighInRequest(BaseModel):
+    weight_lb: float
+
+
+@app.post("/api/weigh-ins")
+def add_weigh_in(body: WeighInRequest, current_user=Depends(get_current_user)) -> dict:
+    row = db.insert_weigh_in(user_id=current_user["id"], weight_lb=body.weight_lb)
+    return _row_to_weigh_in(row)
+
+
+@app.patch("/api/weigh-ins/{weigh_in_id}")
+def update_weigh_in(weigh_in_id: int, body: WeighInRequest, current_user=Depends(get_current_user)) -> dict:
+    row = db.update_weigh_in(weigh_in_id, current_user["id"], body.weight_lb)
+    if row is None:
+        raise HTTPException(status_code=404, detail="No such weigh-in.")
+    return _row_to_weigh_in(row)
+
+
+@app.delete("/api/weigh-ins/{weigh_in_id}")
+def remove_weigh_in(weigh_in_id: int, current_user=Depends(get_current_user)) -> dict:
+    deleted = db.delete_weigh_in(weigh_in_id, current_user["id"])
+    if not deleted:
+        raise HTTPException(status_code=404, detail="No such weigh-in.")
+    return {"ok": True}
+
+
+@app.get("/api/weigh-ins")
+def get_weigh_ins(current_user=Depends(get_current_user)) -> list[dict]:
+    return [_row_to_weigh_in(row) for row in db.list_weigh_ins(current_user["id"])]
+
+
+class FavoriteEntryRequest(BaseModel):
+    food_name: str
+    description: str
+    estimated_calories: int
+    confidence: str
+    protein_g: float = 0
+    carbs_g: float = 0
+    fat_g: float = 0
+
+
+@app.post("/api/favorites")
+def add_favorite(body: FavoriteEntryRequest, current_user=Depends(get_current_user)) -> dict:
+    row = db.insert_favorite(
+        user_id=current_user["id"],
+        food_name=body.food_name,
+        description=body.description,
+        estimated_calories=body.estimated_calories,
+        confidence=body.confidence,
+        protein_g=body.protein_g,
+        carbs_g=body.carbs_g,
+        fat_g=body.fat_g,
+    )
+    return _row_to_favorite(row)
+
+
+@app.delete("/api/favorites/{favorite_id}")
+def remove_favorite(favorite_id: int, current_user=Depends(get_current_user)) -> dict:
+    deleted = db.delete_favorite(favorite_id, current_user["id"])
+    if not deleted:
+        raise HTTPException(status_code=404, detail="No such favorite.")
+    return {"ok": True}
+
+
+@app.get("/api/favorites")
+def get_favorites(current_user=Depends(get_current_user)) -> list[dict]:
+    return [_row_to_favorite(row) for row in db.list_favorites(current_user["id"])]

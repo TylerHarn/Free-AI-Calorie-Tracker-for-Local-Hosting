@@ -49,6 +49,7 @@ export default function SetupPage({
   const [weightLb, setWeightLb] = useState(user.weight_kg != null ? String(kgToLb(user.weight_kg)) : "");
   const [activityLevel, setActivityLevel] = useState<ActivityLevel>((user.activity_level as ActivityLevel) ?? "moderate");
   const [weeklyLossRate, setWeeklyLossRate] = useState(user.weekly_loss_rate_lb ?? 1);
+  const [goalWeightLb, setGoalWeightLb] = useState(user.goal_weight_lb != null ? String(user.goal_weight_lb) : "");
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -66,6 +67,8 @@ export default function SetupPage({
       return;
     }
 
+    const parsedGoalWeight = goalWeightLb.trim() === "" ? undefined : Number(goalWeightLb);
+
     setIsSaving(true);
     try {
       const updated = await saveSetup({
@@ -76,6 +79,7 @@ export default function SetupPage({
         weight_lb: parsedWeight,
         activity_level: activityLevel,
         weekly_loss_rate_lb: weeklyLossRate,
+        goal_weight_lb: parsedGoalWeight,
       });
       onComplete(updated);
     } catch (err) {
@@ -202,6 +206,18 @@ export default function SetupPage({
               </button>
             ))}
           </div>
+        </div>
+
+        <div>
+          <FieldLabel>Goal weight (lb, optional)</FieldLabel>
+          <input
+            type="number"
+            min={1}
+            placeholder="No target set"
+            value={goalWeightLb}
+            onChange={(e) => setGoalWeightLb(e.target.value)}
+            className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 font-mono text-sm focus:border-ember focus:outline-none"
+          />
         </div>
 
         {error && <p className="rounded-xl bg-rust/10 p-3 font-sans text-sm text-rust">{error}</p>}
