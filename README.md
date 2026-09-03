@@ -44,3 +44,18 @@ npm run dev
 ```
 
 Then open the URL Vite prints (defaults to http://localhost:5173). Both servers need to be running.
+
+## Running with Docker
+
+Requires Docker and Docker Compose.
+
+```
+cd backend
+cp .env.example .env   # then fill in COHERE_API_KEY
+cd ..
+docker compose up --build
+```
+
+Then open http://localhost:8080. The frontend container serves the built app via nginx and proxies `/api` requests to the backend container; meal/user data persists in a named Docker volume (`meals-data`) across restarts and rebuilds.
+
+**Security note:** this app has no password — anyone who can reach it can act as any household member (by design, for trusted local-network use per the original README description). Don't expose the Docker containers directly to the public internet (e.g. via a port forward) without adding real authentication in front of them.

@@ -1,8 +1,9 @@
+import os
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 
-DB_PATH = Path(__file__).parent / "meals.db"
+DB_PATH = Path(os.environ.get("DB_PATH", str(Path(__file__).parent / "meals.db")))
 
 
 def get_connection() -> sqlite3.Connection:
