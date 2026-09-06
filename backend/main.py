@@ -13,7 +13,12 @@ from calorie_calc import (
     lb_to_kg,
     list_activities,
 )
-from cohere_client import CohereEstimationError, estimate_calories, estimate_from_name
+from cohere_client import (
+    CohereEstimationError,
+    estimate_calories,
+    estimate_from_description,
+    estimate_from_name,
+)
 from food_lookup import FoodLookupError, lookup_barcode
 
 load_dotenv()
@@ -232,6 +237,24 @@ def estimate_meal_from_name(body: MealNameEstimateRequest, current_user=Depends(
 
     try:
         result = estimate_from_name(food_name)
+    except CohereEstimationError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    return _meal_estimate_response(result)
+
+
+class MealDescriptionEstimateRequest(BaseModel):
+    description: str
+
+
+@app.post("/api/meals/estimate-from-description")
+def estimate_meal_from_description(body: MealDescriptionEstimateRequest, current_user=Depends(get_current_user)) -> dict:
+    description = body.description.strip()
+    if not description:
+        raise HTTPException(status_code=400, detail="Description is required.")
+
+    try:
+        result = estimate_from_description(description)
     except CohereEstimationError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 

@@ -34,6 +34,16 @@ NAME_LOOKUP_PROMPT_SUFFIX = (
     "exactly this shape:\n" + RESPONSE_SHAPE
 )
 
+DESCRIPTION_PROMPT_PREFIX = (
+    "You are a nutrition estimation assistant. A user described everything they ate or drank "
+    "in one sitting: "
+)
+DESCRIPTION_PROMPT_SUFFIX = (
+    ". Identify every distinct food and drink mentioned and estimate the combined total nutrition "
+    "for all of it together. Respond with ONLY a single JSON object (no markdown fences, no "
+    "commentary) in exactly this shape:\n" + RESPONSE_SHAPE
+)
+
 
 class CohereEstimationError(RuntimeError):
     pass
@@ -110,4 +120,9 @@ def estimate_calories(image_bytes: bytes, content_type: str) -> dict:
 
 def estimate_from_name(food_name: str) -> dict:
     prompt = NAME_LOOKUP_PROMPT_PREFIX + repr(food_name) + NAME_LOOKUP_PROMPT_SUFFIX
+    return _chat_and_parse([{"type": "text", "text": prompt}])
+
+
+def estimate_from_description(description: str) -> dict:
+    prompt = DESCRIPTION_PROMPT_PREFIX + repr(description) + DESCRIPTION_PROMPT_SUFFIX
     return _chat_and_parse([{"type": "text", "text": prompt}])

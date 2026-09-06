@@ -146,6 +146,14 @@ export function estimateMealFromName(foodName: string): Promise<MealEstimate> {
   });
 }
 
+export function estimateMealFromDescription(description: string): Promise<MealEstimate> {
+  return request("/api/meals/estimate-from-description", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ description }),
+  });
+}
+
 export function addMeal(entry: MealEstimate): Promise<Meal> {
   return request("/api/meals", {
     method: "POST",
