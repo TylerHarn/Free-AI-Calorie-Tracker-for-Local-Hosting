@@ -7,6 +7,7 @@ import {
   deleteMeal,
   deleteWorkout,
   estimateMeal,
+  estimateMealFromDescription,
   estimateWorkout,
   getFavorites,
   getMealHistory,
@@ -33,6 +34,7 @@ import QuickActionsGrid, { type QuickAction } from "./QuickActionsGrid";
 import QuickAddFavorites from "./QuickAddFavorites";
 import ScanBarcode from "./ScanBarcode";
 import SettingsMenu from "./SettingsMenu";
+import VoiceCapture from "./VoiceCapture";
 import WorkoutResult from "./WorkoutResult";
 
 function isToday(isoString: string) {
@@ -91,6 +93,20 @@ export default function TrackerPage({
     setPendingEstimate(null);
     try {
       const estimate = await estimateMeal(image);
+      setPendingEstimate(estimate);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setIsEstimating(false);
+    }
+  }
+
+  async function handleEstimateFromVoice(description: string) {
+    setIsEstimating(true);
+    setError(null);
+    setPendingEstimate(null);
+    try {
+      const estimate = await estimateMealFromDescription(description);
       setPendingEstimate(estimate);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -289,8 +305,9 @@ export default function TrackerPage({
         <MacroSummary protein={proteinToday} carbs={carbsToday} fat={fatToday} />
       </div>
 
-      <div className="mb-6">
+      <div className="mb-6 flex items-center justify-center gap-6">
         <PhotoCapture onEstimate={handleEstimate} isEstimating={isEstimating} />
+        <VoiceCapture onEstimate={handleEstimateFromVoice} isEstimating={isEstimating} />
       </div>
 
       {error && <p className="mb-4 rounded-xl bg-rust/10 p-3 text-center font-sans text-sm text-rust">{error}</p>}
