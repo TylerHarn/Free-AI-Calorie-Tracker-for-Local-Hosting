@@ -42,6 +42,7 @@ interface DailyLogProps {
   workouts: Workout[];
   onUpdateMealCalories: (id: number, calories: number) => void;
   onUpdateMealMacros: (id: number, macros: Macros) => void;
+  onUpdateMealServingSize: (id: number, servingSize: string) => void;
   onDeleteMeal: (id: number) => void;
   onSaveFavorite: (meal: Meal) => void;
   onUpdateWorkoutCalories: (id: number, calories: number) => void;
@@ -49,14 +50,24 @@ interface DailyLogProps {
 }
 
 type Entry =
-  | { kind: "meal"; id: number; name: string; calories: number; macros: Macros; created_at: string; raw: Meal }
-  | { kind: "workout"; id: number; name: string; calories: number; macros: null; created_at: string };
+  | {
+      kind: "meal";
+      id: number;
+      name: string;
+      calories: number;
+      macros: Macros;
+      servingSize: string;
+      created_at: string;
+      raw: Meal;
+    }
+  | { kind: "workout"; id: number; name: string; calories: number; macros: null; servingSize: null; created_at: string };
 
 export default function DailyLog({
   meals,
   workouts,
   onUpdateMealCalories,
   onUpdateMealMacros,
+  onUpdateMealServingSize,
   onDeleteMeal,
   onSaveFavorite,
   onUpdateWorkoutCalories,
@@ -70,6 +81,7 @@ export default function DailyLog({
         name: meal.food_name,
         calories: meal.estimated_calories,
         macros: { protein_g: meal.protein_g, carbs_g: meal.carbs_g, fat_g: meal.fat_g },
+        servingSize: meal.serving_size,
         created_at: meal.created_at,
         raw: meal,
       })
@@ -81,6 +93,7 @@ export default function DailyLog({
         name: workout.activity_name,
         calories: workout.calories_burned,
         macros: null,
+        servingSize: null,
         created_at: workout.created_at,
       })
     ),
@@ -98,6 +111,7 @@ export default function DailyLog({
           entry={entry}
           onUpdateCalories={entry.kind === "meal" ? onUpdateMealCalories : onUpdateWorkoutCalories}
           onUpdateMacros={entry.kind === "meal" ? onUpdateMealMacros : undefined}
+          onUpdateServingSize={entry.kind === "meal" ? onUpdateMealServingSize : undefined}
           onDelete={entry.kind === "meal" ? onDeleteMeal : onDeleteWorkout}
           onSaveFavorite={entry.kind === "meal" ? () => onSaveFavorite(entry.raw) : undefined}
         />
@@ -110,12 +124,14 @@ function LogRow({
   entry,
   onUpdateCalories,
   onUpdateMacros,
+  onUpdateServingSize,
   onDelete,
   onSaveFavorite,
 }: {
   entry: Entry;
   onUpdateCalories: (id: number, calories: number) => void;
   onUpdateMacros?: (id: number, macros: Macros) => void;
+  onUpdateServingSize?: (id: number, servingSize: string) => void;
   onDelete: (id: number) => void;
   onSaveFavorite?: () => void;
 }) {
@@ -144,6 +160,16 @@ function LogRow({
             <p className={`truncate text-sm ${isWorkout ? "text-workout" : "text-ink"}`}>{entry.name}</p>
             <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1">
               <span className="text-xs text-ink/40">{formatDate(entry.created_at)}</span>
+              {entry.kind === "meal" && onUpdateServingSize && (
+                <>
+                  <span className="text-xs text-ink/25">·</span>
+                  <ServingSizeLabel
+                    id={entry.id}
+                    servingSize={entry.servingSize}
+                    onUpdateServingSize={onUpdateServingSize}
+                  />
+                </>
+              )}
               {entry.kind === "meal" && onUpdateMacros && (
                 <>
                   <span className="text-xs text-ink/25">·</span>
@@ -214,6 +240,62 @@ function LogRow({
         </div>
       </div>
     </li>
+  );
+}
+
+function ServingSizeLabel({
+  id,
+  servingSize,
+  onUpdateServingSize,
+}: {
+  id: number;
+  servingSize: string;
+  onUpdateServingSize: (id: number, servingSize: string) => void;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [draft, setDraft] = useState(servingSize);
+
+  function handleSave() {
+    onUpdateServingSize(id, draft.trim());
+    setIsEditing(false);
+  }
+
+  if (isEditing) {
+    return (
+      <div className="mt-1 flex w-full basis-full flex-wrap items-center gap-1.5">
+        <input
+          type="text"
+          autoFocus
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder="Serving size"
+          className="w-32 rounded-md border border-ink/20 bg-paper px-1.5 py-1 text-xs focus:border-accent focus:outline-none"
+        />
+        <button type="button" onClick={handleSave} className="text-xs font-semibold text-success">
+          Save
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setDraft(servingSize);
+            setIsEditing(false);
+          }}
+          className="text-xs font-medium text-ink/40"
+        >
+          Cancel
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => setIsEditing(true)}
+      className="text-xs font-medium text-ink/50 hover:text-accent"
+    >
+      {servingSize || "Add serving size"}
+    </button>
   );
 }
 

@@ -42,12 +42,12 @@ def lookup_barcode(barcode: str) -> dict:
         per_100g = nutriments.get(key) or 0
         return round(float(per_100g) * quantity_g / 100)
 
-    serving_size = product.get("serving_size")
-    description = f"Barcode scan — {serving_size}" if serving_size else f"Barcode scan — {round(quantity_g)}g serving"
+    serving_size = product.get("serving_size") or f"{round(quantity_g)}g serving"
 
     return {
         "food_name": food_name,
-        "description": description,
+        "description": "Barcode scan",
+        "serving_size": serving_size,
         "estimated_calories": scaled("energy-kcal_100g"),
         "protein_g": scaled("proteins_100g"),
         "carbs_g": scaled("carbohydrates_100g"),

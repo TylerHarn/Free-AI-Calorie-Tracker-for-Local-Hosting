@@ -15,6 +15,7 @@ import {
   logout,
   updateMealCalories,
   updateMealMacros,
+  updateMealServingSize,
   updateWorkoutCalories,
   type Favorite,
   type Meal,
@@ -151,6 +152,17 @@ export default function TrackerPage({
     }
   }
 
+  async function handleUpdateServingSize(id: number, servingSize: string) {
+    const previous = history;
+    setHistory((prev) => prev.map((meal) => (meal.id === id ? { ...meal, serving_size: servingSize } : meal)));
+    try {
+      await updateMealServingSize(id, servingSize);
+    } catch (err) {
+      setHistory(previous);
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    }
+  }
+
   async function handleDelete(id: number) {
     const previous = history;
     setHistory((prev) => prev.filter((meal) => meal.id !== id));
@@ -217,6 +229,7 @@ export default function TrackerPage({
       const favorite = await addFavorite({
         food_name: meal.food_name,
         description: meal.description,
+        serving_size: meal.serving_size,
         estimated_calories: meal.estimated_calories,
         confidence: meal.confidence,
         protein_g: meal.protein_g,
@@ -316,7 +329,9 @@ export default function TrackerPage({
         <div className="mb-6">
           <CalorieResult
             estimate={pendingEstimate}
-            onAdd={(calories) => handleAddEntry({ ...pendingEstimate, estimated_calories: calories })}
+            onAdd={(calories, servingSize) =>
+              handleAddEntry({ ...pendingEstimate, estimated_calories: calories, serving_size: servingSize })
+            }
             onDiscard={() => setPendingEstimate(null)}
             isSaving={isSavingEstimate}
           />
@@ -376,6 +391,7 @@ export default function TrackerPage({
             workouts={workouts}
             onUpdateMealCalories={handleUpdateCalories}
             onUpdateMealMacros={handleUpdateMacros}
+            onUpdateMealServingSize={handleUpdateServingSize}
             onSaveFavorite={handleSaveFavorite}
             onDeleteMeal={handleDelete}
             onUpdateWorkoutCalories={handleUpdateWorkoutCalories}

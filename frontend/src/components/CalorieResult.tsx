@@ -16,11 +16,12 @@ export default function CalorieResult({
   isSaving,
 }: {
   estimate: MealEstimate;
-  onAdd: (calories: number) => void;
+  onAdd: (calories: number, servingSize: string) => void;
   onDiscard: () => void;
   isSaving: boolean;
 }) {
   const [calories, setCalories] = useState(String(estimate.estimated_calories));
+  const [servingSize, setServingSize] = useState(estimate.serving_size);
 
   const parsedCalories = Number(calories);
   const isValid = calories.trim() !== "" && Number.isFinite(parsedCalories) && parsedCalories >= 0;
@@ -29,6 +30,14 @@ export default function CalorieResult({
     <div className="rounded-2xl border border-ink/10 bg-paper-raised p-5">
       <p className="text-xs font-semibold uppercase tracking-wide text-ink/40">New entry</p>
       <p className="mt-1 text-xl font-semibold text-ink">{estimate.food_name}</p>
+
+      <input
+        type="text"
+        value={servingSize}
+        onChange={(e) => setServingSize(e.target.value)}
+        placeholder="Serving size (e.g. 1 cup, 200g)"
+        className="mt-2 w-full rounded-lg border border-ink/15 bg-paper px-2 py-1 text-sm focus:border-accent focus:outline-none"
+      />
 
       <div className="mt-3 flex items-baseline gap-1">
         <input
@@ -64,7 +73,7 @@ export default function CalorieResult({
         </button>
         <button
           type="button"
-          onClick={() => onAdd(parsedCalories)}
+          onClick={() => onAdd(parsedCalories, servingSize.trim())}
           disabled={isSaving || !isValid}
           className="flex-1 rounded-full bg-accent-fill py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
         >

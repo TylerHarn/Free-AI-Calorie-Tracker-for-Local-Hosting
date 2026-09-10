@@ -41,7 +41,12 @@ export default function QuickAddFavorites({
                 onClick={() => onAdd(favorite)}
                 className="flex flex-1 items-center justify-between rounded-lg border border-ink/10 bg-paper px-3 py-2 text-left transition hover:border-accent"
               >
-                <span className="truncate text-sm text-ink">{favorite.food_name}</span>
+                <span className="min-w-0 flex-1 truncate">
+                  <span className="text-sm text-ink">{favorite.food_name}</span>
+                  {favorite.serving_size && (
+                    <span className="ml-1.5 text-xs text-ink/40">{favorite.serving_size}</span>
+                  )}
+                </span>
                 <span className="ml-2 shrink-0 text-sm font-semibold tabular-nums text-ink/70">
                   {favorite.estimated_calories}
                 </span>

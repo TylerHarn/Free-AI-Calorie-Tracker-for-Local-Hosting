@@ -17,6 +17,7 @@ export default function AddMealManually({
   onClose: () => void;
 }) {
   const [foodName, setFoodName] = useState("");
+  const [servingSize, setServingSize] = useState("");
   const [calories, setCalories] = useState("");
   const [protein, setProtein] = useState("");
   const [carbs, setCarbs] = useState("");
@@ -28,6 +29,7 @@ export default function AddMealManually({
 
   function reset() {
     setFoodName("");
+    setServingSize("");
     setCalories("");
     setProtein("");
     setCarbs("");
@@ -45,6 +47,7 @@ export default function AddMealManually({
     setEstimateError(null);
     try {
       const estimate = await estimateMealFromName(name);
+      setServingSize(estimate.serving_size);
       setCalories(String(estimate.estimated_calories));
       setProtein(String(estimate.protein_g));
       setCarbs(String(estimate.carbs_g));
@@ -66,6 +69,7 @@ export default function AddMealManually({
     onAdd({
       food_name: foodName.trim(),
       description,
+      serving_size: servingSize.trim(),
       estimated_calories: parsedCalories,
       confidence,
       protein_g: parseOptionalNumber(protein),
@@ -103,14 +107,23 @@ export default function AddMealManually({
 
       {estimateError && <p className="text-xs text-danger">{estimateError}</p>}
 
-      <input
-        type="number"
-        min={0}
-        placeholder="Calories"
-        value={calories}
-        onChange={(e) => setCalories(e.target.value)}
-        className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 text-sm tabular-nums focus:border-accent focus:outline-none"
-      />
+      <div className="flex gap-2">
+        <input
+          type="text"
+          placeholder="Serving size (e.g. 1 cup, 200g)"
+          value={servingSize}
+          onChange={(e) => setServingSize(e.target.value)}
+          className="flex-1 rounded-lg border border-ink/15 bg-paper px-3 py-2 text-sm focus:border-accent focus:outline-none"
+        />
+        <input
+          type="number"
+          min={0}
+          placeholder="Calories"
+          value={calories}
+          onChange={(e) => setCalories(e.target.value)}
+          className="w-28 rounded-lg border border-ink/15 bg-paper px-3 py-2 text-sm tabular-nums focus:border-accent focus:outline-none"
+        />
+      </div>
 
       <div>
         <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink/40">Macros (optional)</p>

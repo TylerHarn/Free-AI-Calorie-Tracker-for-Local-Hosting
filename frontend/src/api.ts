@@ -3,6 +3,7 @@ export type Confidence = "low" | "medium" | "high" | "manual" | "barcode";
 export interface MealEstimate {
   food_name: string;
   description: string;
+  serving_size: string;
   estimated_calories: number;
   confidence: Confidence;
   protein_g: number;
@@ -178,6 +179,14 @@ export function updateMealMacros(
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(macros),
+  });
+}
+
+export function updateMealServingSize(id: number, servingSize: string): Promise<Meal> {
+  return request(`/api/meals/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ serving_size: servingSize }),
   });
 }
 

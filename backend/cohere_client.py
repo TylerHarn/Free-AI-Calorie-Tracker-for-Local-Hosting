@@ -15,6 +15,7 @@ MODEL = "command-a-vision-07-2025"
 RESPONSE_SHAPE = (
     '{"food_name": "short name of the dish", '
     '"description": "one sentence describing the food and the estimated portion size", '
+    '"serving_size": "short plain-language serving size, e.g. \'1 cup (240g)\' or \'2 slices\'", '
     '"estimated_calories": <integer total calories for the whole plate/portion>, '
     '"protein_g": <integer grams of protein for the whole plate/portion>, '
     '"carbs_g": <integer grams of carbohydrates for the whole plate/portion>, '

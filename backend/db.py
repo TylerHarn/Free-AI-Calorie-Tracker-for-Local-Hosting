@@ -20,6 +20,7 @@ def init_db() -> None:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 food_name TEXT NOT NULL,
                 description TEXT NOT NULL,
+                serving_size TEXT NOT NULL DEFAULT '',
                 estimated_calories INTEGER NOT NULL,
                 confidence TEXT NOT NULL,
                 created_at TEXT NOT NULL
@@ -73,6 +74,7 @@ def init_db() -> None:
                 user_id INTEGER NOT NULL,
                 food_name TEXT NOT NULL,
                 description TEXT NOT NULL,
+                serving_size TEXT NOT NULL DEFAULT '',
                 estimated_calories INTEGER NOT NULL,
                 confidence TEXT NOT NULL,
                 protein_g REAL NOT NULL DEFAULT 0,
@@ -83,13 +85,20 @@ def init_db() -> None:
             """
         )
 
-        # meals predates the users table and the macro columns; add whichever are missing.
+        # meals predates the users table, the macro columns, and serving_size; add whichever are missing.
         existing_columns = {row["name"] for row in conn.execute("PRAGMA table_info(meals)")}
         if "user_id" not in existing_columns:
             conn.execute("ALTER TABLE meals ADD COLUMN user_id INTEGER")
         for macro_column in ("protein_g", "carbs_g", "fat_g"):
             if macro_column not in existing_columns:
                 conn.execute(f"ALTER TABLE meals ADD COLUMN {macro_column} REAL NOT NULL DEFAULT 0")
+        if "serving_size" not in existing_columns:
+            conn.execute("ALTER TABLE meals ADD COLUMN serving_size TEXT NOT NULL DEFAULT ''")
+
+        # favorites predates serving_size.
+        existing_favorite_columns = {row["name"] for row in conn.execute("PRAGMA table_info(favorites)")}
+        if "serving_size" not in existing_favorite_columns:
+            conn.execute("ALTER TABLE favorites ADD COLUMN serving_size TEXT NOT NULL DEFAULT ''")
 
         # users predates goal_weight_lb.
         existing_user_columns = {row["name"] for row in conn.execute("PRAGMA table_info(users)")}
@@ -160,16 +169,28 @@ def insert_meal(
     protein_g: float = 0,
     carbs_g: float = 0,
     fat_g: float = 0,
+    serving_size: str = "",
 ) -> sqlite3.Row:
     created_at = datetime.now(timezone.utc).isoformat()
     with get_connection() as conn:
         cursor = conn.execute(
             """
             INSERT INTO meals
-                (user_id, food_name, description, estimated_calories, confidence, protein_g, carbs_g, fat_g, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (user_id, food_name, description, serving_size, estimated_calories, confidence, protein_g, carbs_g, fat_g, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (user_id, food_name, description, estimated_calories, confidence, protein_g, carbs_g, fat_g, created_at),
+            (
+                user_id,
+                food_name,
+                description,
+                serving_size,
+                estimated_calories,
+                confidence,
+                protein_g,
+                carbs_g,
+                fat_g,
+                created_at,
+            ),
         )
         meal_id = cursor.lastrowid
         row = conn.execute("SELECT * FROM meals WHERE id = ?", (meal_id,)).fetchone()
@@ -183,7 +204,7 @@ def list_meals(user_id: int) -> list[sqlite3.Row]:
         ).fetchall()
 
 
-UPDATABLE_MEAL_FIELDS = {"estimated_calories", "protein_g", "carbs_g", "fat_g"}
+UPDATABLE_MEAL_FIELDS = {"estimated_calories", "protein_g", "carbs_g", "fat_g", "serving_size"}
 
 
 def update_meal(meal_id: int, user_id: int, **fields) -> sqlite3.Row | None:
@@ -298,16 +319,28 @@ def insert_favorite(
     protein_g: float = 0,
     carbs_g: float = 0,
     fat_g: float = 0,
+    serving_size: str = "",
 ) -> sqlite3.Row:
     created_at = datetime.now(timezone.utc).isoformat()
     with get_connection() as conn:
         cursor = conn.execute(
             """
             INSERT INTO favorites
-                (user_id, food_name, description, estimated_calories, confidence, protein_g, carbs_g, fat_g, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (user_id, food_name, description, serving_size, estimated_calories, confidence, protein_g, carbs_g, fat_g, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (user_id, food_name, description, estimated_calories, confidence, protein_g, carbs_g, fat_g, created_at),
+            (
+                user_id,
+                food_name,
+                description,
+                serving_size,
+                estimated_calories,
+                confidence,
+                protein_g,
+                carbs_g,
+                fat_g,
+                created_at,
+            ),
         )
         return conn.execute("SELECT * FROM favorites WHERE id = ?", (cursor.lastrowid,)).fetchone()
 

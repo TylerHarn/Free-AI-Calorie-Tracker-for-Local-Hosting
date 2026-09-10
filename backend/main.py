@@ -48,6 +48,7 @@ def _row_to_meal(row) -> dict:
         "id": row["id"],
         "food_name": row["food_name"],
         "description": row["description"],
+        "serving_size": row["serving_size"],
         "estimated_calories": row["estimated_calories"],
         "confidence": row["confidence"],
         "protein_g": row["protein_g"],
@@ -90,6 +91,7 @@ def _row_to_favorite(row) -> dict:
         "id": row["id"],
         "food_name": row["food_name"],
         "description": row["description"],
+        "serving_size": row["serving_size"],
         "estimated_calories": row["estimated_calories"],
         "confidence": row["confidence"],
         "protein_g": row["protein_g"],
@@ -200,6 +202,7 @@ def _meal_estimate_response(result: dict) -> dict:
     return {
         "food_name": result["food_name"],
         "description": result["description"],
+        "serving_size": result.get("serving_size", ""),
         "estimated_calories": int(result["estimated_calories"]),
         "confidence": result["confidence"],
         "protein_g": result.get("protein_g", 0),
@@ -279,6 +282,7 @@ class MealEntryRequest(BaseModel):
     protein_g: float = 0
     carbs_g: float = 0
     fat_g: float = 0
+    serving_size: str = ""
 
 
 @app.post("/api/meals")
@@ -292,6 +296,7 @@ def add_meal(body: MealEntryRequest, current_user=Depends(get_current_user)) -> 
         protein_g=body.protein_g,
         carbs_g=body.carbs_g,
         fat_g=body.fat_g,
+        serving_size=body.serving_size,
     )
     return _row_to_meal(row)
 
@@ -301,6 +306,7 @@ class UpdateMealRequest(BaseModel):
     protein_g: float | None = None
     carbs_g: float | None = None
     fat_g: float | None = None
+    serving_size: str | None = None
 
 
 @app.patch("/api/meals/{meal_id}")
@@ -312,6 +318,7 @@ def update_meal(meal_id: int, body: UpdateMealRequest, current_user=Depends(get_
         protein_g=body.protein_g,
         carbs_g=body.carbs_g,
         fat_g=body.fat_g,
+        serving_size=body.serving_size,
     )
     if row is None:
         raise HTTPException(status_code=404, detail="No such meal.")
@@ -431,6 +438,7 @@ class FavoriteEntryRequest(BaseModel):
     protein_g: float = 0
     carbs_g: float = 0
     fat_g: float = 0
+    serving_size: str = ""
 
 
 @app.post("/api/favorites")
@@ -444,6 +452,7 @@ def add_favorite(body: FavoriteEntryRequest, current_user=Depends(get_current_us
         protein_g=body.protein_g,
         carbs_g=body.carbs_g,
         fat_g=body.fat_g,
+        serving_size=body.serving_size,
     )
     return _row_to_favorite(row)
 
