@@ -9,10 +9,10 @@ function ToggleSwitch({ checked, onChange, label }: { checked: boolean; onChange
       aria-checked={checked}
       aria-label={label}
       onClick={onChange}
-      className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${checked ? "bg-ember" : "bg-ink/15"}`}
+      className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${checked ? "bg-accent-fill" : "bg-ink/15"}`}
     >
       <span
-        className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-cream transition-transform ${
+        className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${
           checked ? "translate-x-5" : "translate-x-0"
         }`}
       />
@@ -71,13 +71,13 @@ export default function SettingsMenu({
               setIsOpen(false);
               onEditGoal();
             }}
-            className="block w-full px-4 py-3 text-left font-sans text-sm text-ink hover:bg-ink/5"
+            className="block w-full px-4 py-3 text-left text-sm text-ink hover:bg-ink/5"
           >
-            Edit Fitness Goals
+            Edit fitness goals
           </button>
 
-          <div className="flex items-center justify-between border-t border-dotted border-ink/15 px-4 py-3">
-            <span className="font-sans text-sm text-ink">Dark Mode</span>
+          <div className="flex items-center justify-between border-t border-ink/10 px-4 py-3">
+            <span className="text-sm text-ink">Dark mode</span>
             <ToggleSwitch checked={isDark} onChange={toggleDark} label="Toggle dark mode" />
           </div>
 
@@ -87,9 +87,9 @@ export default function SettingsMenu({
               setIsOpen(false);
               onSignOut();
             }}
-            className="block w-full border-t border-dotted border-ink/15 px-4 py-3 text-left font-sans text-sm text-rust hover:bg-rust/5"
+            className="block w-full border-t border-ink/10 px-4 py-3 text-left text-sm text-danger hover:bg-danger/5"
           >
-            Switch User
+            Switch user
           </button>
         </div>
       )}

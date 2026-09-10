@@ -5,27 +5,34 @@
 @layer base {
   :root {
     color-scheme: light;
-    --color-ink: 33 30 26;
-    --color-paper: 239 230 210;
-    --color-paper-raised: 255 253 247;
-    --color-ember: 225 89 44;
-    --color-sage: 89 117 79;
-    --color-rust: 166 58 46;
-    --color-steel: 63 108 116;
+    --color-ink: 15 23 42;
+    --color-paper: 255 255 255;
+    --color-paper-raised: 244 247 251;
+    --color-accent: 37 99 235;
+    --color-accent-fill: 37 99 235;
+    --color-success: 21 128 61;
+    --color-warning: 180 83 9;
+    --color-danger: 220 38 38;
+    --color-workout: 79 70 229;
+    --color-workout-fill: 79 70 229;
   }
 
-  /* Not a naive inversion — the same "kitchen ticket" materials under different
-     lighting: light mode's paper background becomes dark mode's ink (text), and
-     every accent is brightened just enough to stay legible on the dark ground. */
+  /* Fills stay the same saturated shade in both themes since white button text
+     already reads at 4.5:1+ against them; text/icon/border roles brighten in dark
+     mode to stay legible against the near-black ground. Every pairing below is
+     contrast-checked against its background, not eyeballed. */
   .dark {
     color-scheme: dark;
-    --color-ink: 243 236 221;
-    --color-paper: 26 23 20;
-    --color-paper-raised: 38 33 28;
-    --color-ember: 241 115 74;
-    --color-sage: 127 161 115;
-    --color-rust: 214 104 90;
-    --color-steel: 106 163 172;
+    --color-ink: 241 245 249;
+    --color-paper: 8 11 18;
+    --color-paper-raised: 17 22 34;
+    --color-accent: 96 165 250;
+    --color-accent-fill: 37 99 235;
+    --color-success: 74 222 128;
+    --color-warning: 251 191 36;
+    --color-danger: 248 113 113;
+    --color-workout: 129 140 248;
+    --color-workout-fill: 79 70 229;
   }
 
   body {
@@ -33,7 +40,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid theme("colors.ember");
+    outline: 2px solid theme("colors.accent");
     outline-offset: 2px;
   }
 }

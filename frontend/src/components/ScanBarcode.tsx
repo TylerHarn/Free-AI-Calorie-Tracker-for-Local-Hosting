@@ -50,20 +50,20 @@ export default function ScanBarcode({
 
   return (
     <div className="rounded-2xl border border-ink/10 bg-paper-raised p-4 text-center">
-      <p className="font-sans text-sm text-ink/70">{isLoading ? "Reading barcode…" : "Waiting for a photo…"}</p>
+      <p className="text-sm text-ink/70">{isLoading ? "Reading barcode…" : "Waiting for a photo…"}</p>
       <div className="mt-3 flex justify-center gap-2">
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isLoading}
-          className="rounded-full border border-ember/40 bg-ember/10 px-4 py-2 font-sans text-sm font-semibold text-ember transition hover:bg-ember/15 disabled:opacity-50"
+          className="rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm font-semibold text-accent transition hover:bg-accent/15 disabled:opacity-50"
         >
           Retry photo
         </button>
         <button
           type="button"
           onClick={onClose}
-          className="rounded-full border border-ink/15 px-4 py-2 font-sans text-sm font-medium text-ink/70 hover:bg-ink/5"
+          className="rounded-full border border-ink/15 px-4 py-2 text-sm font-medium text-ink/70 hover:bg-ink/5"
         >
           Cancel
         </button>
@@ -76,7 +76,7 @@ export default function ScanBarcode({
         className="hidden"
         onChange={(e) => handleFile(e.target.files?.[0])}
       />
-      {error && <p className="mt-2 font-sans text-xs text-rust">{error}</p>}
+      {error && <p className="mt-2 text-xs text-danger">{error}</p>}
     </div>
   );
 }

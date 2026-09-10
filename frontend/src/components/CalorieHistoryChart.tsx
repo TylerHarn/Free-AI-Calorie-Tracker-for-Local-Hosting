@@ -10,7 +10,7 @@ export interface DaySummary {
 
 export default function CalorieHistoryChart({ days, goal }: { days: DaySummary[]; goal: number }) {
   if (days.length === 0) {
-    return <p className="py-6 text-center font-sans text-sm text-ink/40">No history yet.</p>;
+    return <p className="py-6 text-center text-sm text-ink/40">No history yet.</p>;
   }
 
   const chartHeight = HEIGHT - PADDING - BOTTOM_LABEL_SPACE;
@@ -19,9 +19,9 @@ export default function CalorieHistoryChart({ days, goal }: { days: DaySummary[]
   const goalY = PADDING + chartHeight - (goal / maxValue) * chartHeight;
 
   function barColor(net: number) {
-    if (net > goal) return "fill-rust";
-    if (net >= goal * 0.9) return "fill-ember";
-    return "fill-sage";
+    if (net > goal) return "fill-danger";
+    if (net >= goal * 0.9) return "fill-warning";
+    return "fill-success";
   }
 
   return (
@@ -39,7 +39,7 @@ export default function CalorieHistoryChart({ days, goal }: { days: DaySummary[]
                 x={x + (barWidth * 0.7) / 2}
                 y={HEIGHT - 4}
                 textAnchor="middle"
-                className="fill-ink/40 font-mono text-[8px]"
+                className="fill-ink/40 text-[8px]"
               >
                 {day.dateLabel}
               </text>

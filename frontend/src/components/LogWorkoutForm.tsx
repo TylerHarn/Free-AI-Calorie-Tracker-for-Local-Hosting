@@ -34,11 +34,11 @@ export default function LogWorkoutForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2 rounded-2xl border border-steel/20 bg-paper-raised p-4">
+    <form onSubmit={handleSubmit} className="space-y-2 rounded-2xl border border-workout/20 bg-paper-raised p-4">
       <select
         value={activity}
         onChange={(e) => setActivity(e.target.value)}
-        className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 font-sans text-sm focus:border-steel focus:outline-none"
+        className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 text-sm focus:border-workout focus:outline-none"
       >
         {activities.map((option) => (
           <option key={option.value} value={option.value}>
@@ -52,20 +52,20 @@ export default function LogWorkoutForm({
         placeholder="Duration (minutes)"
         value={duration}
         onChange={(e) => setDuration(e.target.value)}
-        className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 font-mono text-sm focus:border-steel focus:outline-none"
+        className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 text-sm tabular-nums focus:border-workout focus:outline-none"
       />
       <div className="flex gap-2 pt-1">
         <button
           type="button"
           onClick={onClose}
-          className="flex-1 rounded-full border border-ink/15 py-2 font-sans text-sm font-medium text-ink/70 hover:bg-ink/5"
+          className="flex-1 rounded-full border border-ink/15 py-2 text-sm font-medium text-ink/70 hover:bg-ink/5"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isEstimating || !activity || duration.trim() === ""}
-          className="flex-1 rounded-full bg-steel py-2 font-sans text-sm font-semibold text-cream transition hover:bg-steel/90 disabled:opacity-50"
+          className="flex-1 rounded-full bg-workout-fill py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
         >
           {isEstimating ? "Estimating…" : "Estimate"}
         </button>

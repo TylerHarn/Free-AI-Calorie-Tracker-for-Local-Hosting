@@ -14,6 +14,14 @@ import {
 import CalorieHistoryChart, { type DaySummary } from "./CalorieHistoryChart";
 import WeightChart from "./WeightChart";
 
+function CloseIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-4 w-4">
+      <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 const HISTORY_DAYS = 14;
 
 function localDateKey(iso: string) {
@@ -110,18 +118,18 @@ export default function ProgressPage({ user, onBack }: { user: User; onBack: () 
           </svg>
         </button>
         <div>
-          <p className="font-mono text-[11px] tracking-wide text-ink/40">{user.name}</p>
-          <h1 className="font-display text-2xl font-medium text-ink">Progress</h1>
+          <p className="text-xs font-semibold uppercase tracking-wide text-ink/40">{user.name}</p>
+          <h1 className="text-2xl font-semibold text-ink">Progress</h1>
         </div>
       </header>
 
-      {error && <p className="mb-4 rounded-xl bg-rust/10 p-3 text-center font-sans text-sm text-rust">{error}</p>}
+      {error && <p className="mb-4 rounded-xl bg-danger/10 p-3 text-center text-sm text-danger">{error}</p>}
 
       <section className="mb-10">
         <div className="mb-2 flex items-center justify-between">
-          <h2 className="font-mono text-[11px] tracking-wide text-ink/40">Weight</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-ink/40">Weight</h2>
           {latestWeight != null && (
-            <span className="font-mono text-sm font-semibold text-ink">{latestWeight}lb</span>
+            <span className="text-sm font-semibold tabular-nums text-ink">{latestWeight}lb</span>
           )}
         </div>
 
@@ -139,7 +147,7 @@ export default function ProgressPage({ user, onBack }: { user: User; onBack: () 
                 placeholder="Weight (lb)"
                 value={newWeight}
                 onChange={(e) => setNewWeight(e.target.value)}
-                className="flex-1 rounded-lg border border-ink/15 bg-paper px-3 py-2 font-mono text-sm focus:border-ember focus:outline-none"
+                className="flex-1 rounded-lg border border-ink/15 bg-paper px-3 py-2 text-sm tabular-nums focus:border-accent focus:outline-none"
               />
               <button
                 type="button"
@@ -147,14 +155,14 @@ export default function ProgressPage({ user, onBack }: { user: User; onBack: () 
                   setIsAddingWeight(false);
                   setNewWeight("");
                 }}
-                className="rounded-full border border-ink/15 px-4 py-2 font-sans text-sm font-medium text-ink/70 hover:bg-ink/5"
+                className="rounded-full border border-ink/15 px-4 py-2 text-sm font-medium text-ink/70 hover:bg-ink/5"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={newWeight.trim() === ""}
-                className="rounded-full bg-ember px-4 py-2 font-sans text-sm font-semibold text-cream transition hover:bg-ember/90 disabled:opacity-50"
+                className="rounded-full bg-accent-fill px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
               >
                 Log
               </button>
@@ -163,7 +171,7 @@ export default function ProgressPage({ user, onBack }: { user: User; onBack: () 
             <button
               type="button"
               onClick={() => setIsAddingWeight(true)}
-              className="w-full py-2 text-center font-sans text-sm font-medium text-ink/50 underline decoration-dotted underline-offset-4 hover:text-ember"
+              className="w-full py-2 text-center text-sm font-medium text-ink/50 hover:text-accent"
             >
               + Log weight
             </button>
@@ -180,7 +188,7 @@ export default function ProgressPage({ user, onBack }: { user: User; onBack: () 
       </section>
 
       <section>
-        <h2 className="mb-2 font-mono text-[11px] tracking-wide text-ink/40">
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/40">
           Last {HISTORY_DAYS} days
         </h2>
         <div className="rounded-2xl border border-ink/10 bg-paper-raised p-4">
@@ -217,8 +225,8 @@ function WeighInRow({
   }
 
   return (
-    <li className="flex items-center gap-3 border-b border-dotted border-ink/20 py-3 first:pt-0 last:border-b-0">
-      <p className="flex-1 font-mono text-[11px] text-ink/40">
+    <li className="flex items-center gap-3 border-b border-ink/10 py-3 first:pt-0 last:border-b-0">
+      <p className="flex-1 text-xs text-ink/40">
         {new Date(weighIn.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
       </p>
       {isEditing ? (
@@ -229,9 +237,9 @@ function WeighInRow({
             autoFocus
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            className="w-20 rounded-md border border-ink/20 bg-paper px-2 py-1 text-right font-mono text-sm focus:border-ember focus:outline-none"
+            className="w-20 rounded-md border border-ink/20 bg-paper px-2 py-1 text-right text-sm tabular-nums focus:border-accent focus:outline-none"
           />
-          <button type="button" onClick={handleSave} className="font-sans text-xs font-semibold text-sage">
+          <button type="button" onClick={handleSave} className="text-xs font-semibold text-success">
             Save
           </button>
           <button
@@ -240,7 +248,7 @@ function WeighInRow({
               setDraft(String(weighIn.weight_lb));
               setIsEditing(false);
             }}
-            className="font-sans text-xs font-medium text-ink/40"
+            className="text-xs font-medium text-ink/40"
           >
             Cancel
           </button>
@@ -250,17 +258,17 @@ function WeighInRow({
           <button
             type="button"
             onClick={() => setIsEditing(true)}
-            className="min-h-11 rounded-lg px-2 font-mono text-sm font-semibold text-ink hover:text-ember"
+            className="min-h-11 rounded-lg px-2 text-sm font-semibold tabular-nums text-ink hover:text-accent"
           >
             {weighIn.weight_lb}lb
           </button>
           <button
             type="button"
             onClick={() => onDelete(weighIn.id)}
-            className="flex h-11 w-11 items-center justify-center rounded-full text-lg text-ink/30 hover:bg-rust/10 hover:text-rust"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-ink/30 hover:bg-danger/10 hover:text-danger"
             aria-label="Delete weigh-in"
           >
-            ✕
+            <CloseIcon />
           </button>
         </div>
       )}

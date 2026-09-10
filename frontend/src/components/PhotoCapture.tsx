@@ -25,7 +25,7 @@ export default function PhotoCapture({ onEstimate, isEstimating }: PhotoCaptureP
       <div className="flex items-center gap-4 rounded-2xl border border-ink/10 bg-paper-raised p-4">
         <img src={previewUrl} alt="Selected meal" className="h-16 w-16 shrink-0 rounded-lg object-cover" />
         <div className="min-w-0 flex-1">
-          <p className="truncate font-sans text-sm text-ink/70">Ready to estimate</p>
+          <p className="truncate text-sm text-ink/70">Ready to estimate</p>
         </div>
         <button
           type="button"
@@ -33,7 +33,7 @@ export default function PhotoCapture({ onEstimate, isEstimating }: PhotoCaptureP
             setPreviewUrl(null);
             setSelectedBlob(null);
           }}
-          className="shrink-0 font-sans text-sm font-medium text-ink/40 hover:text-ink"
+          className="shrink-0 text-sm font-medium text-ink/40 hover:text-ink"
         >
           Retake
         </button>
@@ -41,7 +41,7 @@ export default function PhotoCapture({ onEstimate, isEstimating }: PhotoCaptureP
           type="button"
           disabled={isEstimating}
           onClick={() => onEstimate(selectedBlob)}
-          className="shrink-0 rounded-full bg-ember px-4 py-2 font-sans text-sm font-semibold text-cream transition hover:bg-ember/90 disabled:opacity-50"
+          className="shrink-0 rounded-full bg-accent-fill px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
         >
           {isEstimating ? "Estimating…" : "Estimate"}
         </button>
@@ -55,7 +55,7 @@ export default function PhotoCapture({ onEstimate, isEstimating }: PhotoCaptureP
         type="button"
         onClick={() => fileInputRef.current?.click()}
         aria-label="Log a meal photo"
-        className="flex h-24 w-24 items-center justify-center rounded-full bg-ember text-cream shadow-lg shadow-ember/30 transition active:scale-95"
+        className="flex h-24 w-24 items-center justify-center rounded-full bg-accent-fill text-white shadow-lg shadow-accent/30 transition active:scale-95"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-10 w-10">
           <path
@@ -68,7 +68,7 @@ export default function PhotoCapture({ onEstimate, isEstimating }: PhotoCaptureP
           <circle cx="12" cy="13" r="4" stroke="currentColor" strokeWidth="1.8" />
         </svg>
       </button>
-      <p className="font-sans text-sm font-medium text-ink/70">Log a meal</p>
+      <p className="text-sm font-medium text-ink/70">Log a meal</p>
       <input
         ref={fileInputRef}
         type="file"

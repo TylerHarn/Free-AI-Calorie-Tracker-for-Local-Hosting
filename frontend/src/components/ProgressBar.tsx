@@ -17,8 +17,8 @@ export default function ProgressBar({
   const isOver = net > goal;
   const isNearLimit = !isOver && fraction >= 0.9;
 
-  const ringColor = isOver ? "stroke-rust" : isNearLimit ? "stroke-ember" : "stroke-sage";
-  const labelColor = isOver ? "text-rust" : "text-ink";
+  const ringColor = isOver ? "stroke-danger" : isNearLimit ? "stroke-warning" : "stroke-success";
+  const labelColor = isOver ? "text-danger" : "text-ink";
 
   return (
     <div className="flex flex-col items-center">
@@ -45,19 +45,19 @@ export default function ProgressBar({
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className={`font-mono text-4xl font-bold tabular-nums ${labelColor}`}>{net}</span>
-          <span className="font-mono text-sm text-ink/50">/ {goal} kcal</span>
+          <span className={`text-4xl font-bold tabular-nums ${labelColor}`}>{net}</span>
+          <span className="text-sm tabular-nums text-ink/50">/ {goal} kcal</span>
         </div>
       </div>
 
       {burned > 0 && (
-        <span className="mt-3 inline-block rounded-full bg-steel/15 px-3 py-1 font-mono text-xs font-semibold text-steel">
+        <span className="mt-3 inline-block rounded-full bg-workout/15 px-3 py-1 text-xs font-semibold tabular-nums text-workout">
           −{burned} kcal from workouts
         </span>
       )}
 
       {isOver && (
-        <p className="mt-2 font-mono text-xs text-rust">{net - goal} kcal over today's goal</p>
+        <p className="mt-2 text-xs text-danger">{net - goal} kcal over today's goal</p>
       )}
     </div>
   );

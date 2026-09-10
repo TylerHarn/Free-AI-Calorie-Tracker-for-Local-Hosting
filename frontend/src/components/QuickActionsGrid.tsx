@@ -50,10 +50,10 @@ function ActivityIcon() {
 }
 
 const ACTIONS: { value: QuickAction; label: string; icon: JSX.Element; accent: string }[] = [
-  { value: "manual", label: "By Hand", icon: <EditIcon />, accent: "text-ember" },
-  { value: "barcode", label: "Barcode", icon: <BarcodeIcon />, accent: "text-ember" },
-  { value: "favorites", label: "Favorites", icon: <StarIcon />, accent: "text-ember" },
-  { value: "workout", label: "Workout", icon: <ActivityIcon />, accent: "text-steel" },
+  { value: "manual", label: "Manual", icon: <EditIcon />, accent: "text-accent" },
+  { value: "barcode", label: "Barcode", icon: <BarcodeIcon />, accent: "text-accent" },
+  { value: "favorites", label: "Favorites", icon: <StarIcon />, accent: "text-accent" },
+  { value: "workout", label: "Workout", icon: <ActivityIcon />, accent: "text-workout" },
 ];
 
 export default function QuickActionsGrid({ onSelect }: { onSelect: (action: QuickAction) => void }) {
@@ -67,7 +67,7 @@ export default function QuickActionsGrid({ onSelect }: { onSelect: (action: Quic
           className="flex flex-col items-center gap-1.5 rounded-2xl border border-ink/10 bg-paper-raised py-4 transition hover:border-ink/25"
         >
           <span className={action.accent}>{action.icon}</span>
-          <span className="font-sans text-xs font-medium text-ink/70">{action.label}</span>
+          <span className="text-xs font-medium text-ink/70">{action.label}</span>
         </button>
       ))}
     </div>

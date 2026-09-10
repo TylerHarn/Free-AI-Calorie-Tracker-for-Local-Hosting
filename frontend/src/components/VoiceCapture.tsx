@@ -83,12 +83,12 @@ export default function VoiceCapture({ onEstimate, isEstimating }: VoiceCaptureP
     return (
       <div className="flex items-center gap-4 rounded-2xl border border-ink/10 bg-paper-raised p-4">
         <div className="min-w-0 flex-1">
-          <p className="truncate font-sans text-sm text-ink/70">"{transcript}"</p>
+          <p className="truncate text-sm text-ink/70">"{transcript}"</p>
         </div>
         <button
           type="button"
           onClick={tryAgain}
-          className="shrink-0 font-sans text-sm font-medium text-ink/40 hover:text-ink"
+          className="shrink-0 text-sm font-medium text-ink/40 hover:text-ink"
         >
           Try again
         </button>
@@ -96,7 +96,7 @@ export default function VoiceCapture({ onEstimate, isEstimating }: VoiceCaptureP
           type="button"
           disabled={isEstimating}
           onClick={() => onEstimate(transcript)}
-          className="shrink-0 rounded-full bg-ember px-4 py-2 font-sans text-sm font-semibold text-cream transition hover:bg-ember/90 disabled:opacity-50"
+          className="shrink-0 rounded-full bg-accent-fill px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
         >
           {isEstimating ? "Estimating…" : "Use this"}
         </button>
@@ -164,10 +164,10 @@ export default function VoiceCapture({ onEstimate, isEstimating }: VoiceCaptureP
           </svg>
         )}
       </button>
-      <p className="font-sans text-sm font-medium text-ink/70">
+      <p className="text-sm font-medium text-ink/70">
         {isUnsupported ? "Voice input isn't supported in this browser" : isListening ? "Listening…" : "Log a meal by voice"}
       </p>
-      {errorMessage && <p className="font-sans text-xs text-rust">{errorMessage}</p>}
+      {errorMessage && <p className="text-xs text-danger">{errorMessage}</p>}
     </div>
   );
 }

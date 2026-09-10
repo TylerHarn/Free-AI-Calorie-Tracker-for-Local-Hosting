@@ -6,7 +6,7 @@ const PADDING = 24;
 
 export default function WeightChart({ weighIns, goalWeightLb }: { weighIns: WeighIn[]; goalWeightLb: number | null }) {
   if (weighIns.length === 0) {
-    return <p className="py-6 text-center font-sans text-sm text-ink/40">No weigh-ins logged yet.</p>;
+    return <p className="py-6 text-center text-sm text-ink/40">No weigh-ins logged yet.</p>;
   }
 
   const sorted = [...weighIns].sort((a, b) => a.created_at.localeCompare(b.created_at));
@@ -48,14 +48,14 @@ export default function WeightChart({ weighIns, goalWeightLb }: { weighIns: Weig
             strokeDasharray="4 3"
             strokeWidth={1}
           />
-          <text x={WIDTH - PADDING} y={yFor(goalWeightLb) - 4} textAnchor="end" className="fill-ink/40 font-mono text-[9px]">
+          <text x={WIDTH - PADDING} y={yFor(goalWeightLb) - 4} textAnchor="end" className="fill-ink/40 text-[9px]">
             Goal {goalWeightLb}lb
           </text>
         </>
       )}
-      <path d={path} fill="none" className="stroke-ink" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={path} fill="none" className="stroke-accent" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
       {points.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r={3} className="fill-ink" />
+        <circle key={i} cx={p.x} cy={p.y} r={3} className="fill-accent" />
       ))}
     </svg>
   );

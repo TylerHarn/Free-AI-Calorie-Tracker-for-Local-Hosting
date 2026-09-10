@@ -89,19 +89,19 @@ export default function AddMealManually({
             setEstimateError(null);
           }}
           autoFocus
-          className="flex-1 rounded-lg border border-ink/15 bg-paper px-3 py-2 font-sans text-sm focus:border-ember focus:outline-none"
+          className="flex-1 rounded-lg border border-ink/15 bg-paper px-3 py-2 text-sm focus:border-accent focus:outline-none"
         />
         <button
           type="button"
           onClick={handleEstimate}
           disabled={isEstimating || !foodName.trim()}
-          className="shrink-0 rounded-lg border border-ember/40 bg-ember/10 px-3 py-2 font-sans text-xs font-semibold text-ember transition hover:bg-ember/15 disabled:opacity-50"
+          className="shrink-0 rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-xs font-semibold text-accent transition hover:bg-accent/15 disabled:opacity-50"
         >
           {isEstimating ? "Estimating…" : "Estimate"}
         </button>
       </div>
 
-      {estimateError && <p className="font-sans text-xs text-rust">{estimateError}</p>}
+      {estimateError && <p className="text-xs text-danger">{estimateError}</p>}
 
       <input
         type="number"
@@ -109,11 +109,11 @@ export default function AddMealManually({
         placeholder="Calories"
         value={calories}
         onChange={(e) => setCalories(e.target.value)}
-        className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 font-mono text-sm focus:border-ember focus:outline-none"
+        className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 text-sm tabular-nums focus:border-accent focus:outline-none"
       />
 
       <div>
-        <p className="mb-1 font-mono text-[11px] tracking-wide text-ink/40">Macros (optional)</p>
+        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink/40">Macros (optional)</p>
         <div className="flex gap-2">
           <input
             type="number"
@@ -121,7 +121,7 @@ export default function AddMealManually({
             placeholder="Protein g"
             value={protein}
             onChange={(e) => setProtein(e.target.value)}
-            className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 font-mono text-sm focus:border-ember focus:outline-none"
+            className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 text-sm tabular-nums focus:border-accent focus:outline-none"
           />
           <input
             type="number"
@@ -129,7 +129,7 @@ export default function AddMealManually({
             placeholder="Carbs g"
             value={carbs}
             onChange={(e) => setCarbs(e.target.value)}
-            className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 font-mono text-sm focus:border-ember focus:outline-none"
+            className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 text-sm tabular-nums focus:border-accent focus:outline-none"
           />
           <input
             type="number"
@@ -137,7 +137,7 @@ export default function AddMealManually({
             placeholder="Fat g"
             value={fat}
             onChange={(e) => setFat(e.target.value)}
-            className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 font-mono text-sm focus:border-ember focus:outline-none"
+            className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 text-sm tabular-nums focus:border-accent focus:outline-none"
           />
         </div>
       </div>
@@ -149,14 +149,14 @@ export default function AddMealManually({
             reset();
             onClose();
           }}
-          className="flex-1 rounded-full border border-ink/15 py-2 font-sans text-sm font-medium text-ink/70 hover:bg-ink/5"
+          className="flex-1 rounded-full border border-ink/15 py-2 text-sm font-medium text-ink/70 hover:bg-ink/5"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={!foodName.trim() || calories.trim() === ""}
-          className="flex-1 rounded-full bg-ember py-2 font-sans text-sm font-semibold text-cream transition hover:bg-ember/90 disabled:opacity-50"
+          className="flex-1 rounded-full bg-accent-fill py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
         >
           Add
         </button>

@@ -12,7 +12,7 @@ const ACTIVITY_OPTIONS: { value: ActivityLevel; label: string }[] = [
 const LOSS_RATE_OPTIONS = [0.5, 1, 1.5, 2];
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
-  return <label className="mb-1.5 block font-mono text-[11px] tracking-wide text-ink/40">{children}</label>;
+  return <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-ink/40">{children}</label>;
 }
 
 function cmToFtIn(cm: number): { ft: number; inches: number } {
@@ -96,17 +96,17 @@ export default function SetupPage({
     >
       <header className="mb-6">
         <div className="flex items-center justify-between">
-          <p className="font-mono text-xs tracking-wide text-ink/40">Order form</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-ink/40">Daily goal</p>
           {isEditing && onCancel && (
-            <button type="button" onClick={onCancel} className="font-sans text-xs font-medium text-ink/50 hover:text-ink">
+            <button type="button" onClick={onCancel} className="text-xs font-medium text-ink/50 hover:text-ink">
               Cancel
             </button>
           )}
         </div>
-        <h1 className="mt-2 font-display text-3xl font-medium text-ink">
+        <h1 className="mt-2 text-2xl font-semibold text-ink">
           {isEditing ? `Update ${user.name}'s goal` : `Let's set ${user.name}'s goal`}
         </h1>
-        <p className="mt-1 font-sans text-sm text-ink/60">
+        <p className="mt-1 text-sm text-ink/60">
           We'll use this to calculate a daily calorie target for weight loss.
         </p>
       </header>
@@ -120,8 +120,8 @@ export default function SetupPage({
                 key={option}
                 type="button"
                 onClick={() => setSex(option)}
-                className={`flex-1 rounded-full border py-2.5 font-sans text-sm font-medium capitalize transition ${
-                  sex === option ? "border-ember bg-ember/10 text-ember" : "border-ink/15 text-ink/60"
+                className={`flex-1 rounded-full border py-2.5 text-sm font-medium capitalize transition ${
+                  sex === option ? "border-accent bg-accent/10 text-accent" : "border-ink/15 text-ink/60"
                 }`}
               >
                 {option}
@@ -137,7 +137,7 @@ export default function SetupPage({
             min={1}
             value={age}
             onChange={(e) => setAge(e.target.value)}
-            className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 font-mono text-sm focus:border-ember focus:outline-none"
+            className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 text-sm tabular-nums focus:border-accent focus:outline-none"
           />
         </div>
 
@@ -150,7 +150,7 @@ export default function SetupPage({
               placeholder="ft"
               value={heightFt}
               onChange={(e) => setHeightFt(e.target.value)}
-              className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 font-mono text-sm focus:border-ember focus:outline-none"
+              className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 text-sm tabular-nums focus:border-accent focus:outline-none"
             />
             <input
               type="number"
@@ -159,7 +159,7 @@ export default function SetupPage({
               placeholder="in"
               value={heightIn}
               onChange={(e) => setHeightIn(e.target.value)}
-              className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 font-mono text-sm focus:border-ember focus:outline-none"
+              className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 text-sm tabular-nums focus:border-accent focus:outline-none"
             />
           </div>
         </div>
@@ -171,7 +171,7 @@ export default function SetupPage({
             min={1}
             value={weightLb}
             onChange={(e) => setWeightLb(e.target.value)}
-            className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 font-mono text-sm focus:border-ember focus:outline-none"
+            className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 text-sm tabular-nums focus:border-accent focus:outline-none"
           />
         </div>
 
@@ -180,7 +180,7 @@ export default function SetupPage({
           <select
             value={activityLevel}
             onChange={(e) => setActivityLevel(e.target.value as ActivityLevel)}
-            className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 font-sans text-sm focus:border-ember focus:outline-none"
+            className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 text-sm focus:border-accent focus:outline-none"
           >
             {ACTIVITY_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -198,8 +198,8 @@ export default function SetupPage({
                 key={rate}
                 type="button"
                 onClick={() => setWeeklyLossRate(rate)}
-                className={`rounded-xl border py-2.5 font-mono text-sm font-medium transition ${
-                  weeklyLossRate === rate ? "border-ember bg-ember/10 text-ember" : "border-ink/15 text-ink/60"
+                className={`rounded-xl border py-2.5 text-sm font-medium tabular-nums transition ${
+                  weeklyLossRate === rate ? "border-accent bg-accent/10 text-accent" : "border-ink/15 text-ink/60"
                 }`}
               >
                 {rate}/wk
@@ -216,20 +216,20 @@ export default function SetupPage({
             placeholder="No target set"
             value={goalWeightLb}
             onChange={(e) => setGoalWeightLb(e.target.value)}
-            className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 font-mono text-sm focus:border-ember focus:outline-none"
+            className="w-full rounded-xl border border-ink/15 bg-paper-raised px-3 py-2.5 text-sm tabular-nums focus:border-accent focus:outline-none"
           />
         </div>
 
-        {error && <p className="rounded-xl bg-rust/10 p-3 font-sans text-sm text-rust">{error}</p>}
+        {error && <p className="rounded-xl bg-danger/10 p-3 text-sm text-danger">{error}</p>}
       </div>
 
       <div className="fixed inset-x-0 bottom-0 border-t border-ink/10 bg-paper/95 px-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
         <button
           type="submit"
           disabled={isSaving}
-          className="w-full rounded-full bg-ember py-3.5 font-sans text-sm font-semibold text-cream transition hover:bg-ember/90 disabled:opacity-50"
+          className="w-full rounded-full bg-accent-fill py-3.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
         >
-          {isSaving ? "Calculating…" : isEditing ? "Update my goal" : "Calculate my goal"}
+          {isSaving ? "Saving…" : isEditing ? "Update my goal" : "Calculate my goal"}
         </button>
       </div>
     </form>
